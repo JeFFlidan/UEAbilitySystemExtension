@@ -26,11 +26,14 @@ public class MvAbilitySystem : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
-				"Slate",
-				"SlateCore",
 				"GameplayAbilities",
 				"GameplayTags",
-				"GameplayTasks"
+				"GameplayTasks",
+				"ModularGameplayActors",
+				"GameFeatures",
+				"EnhancedInput",
+				"InputCore",
+				"ModularGameplay"
 			}
             );
 			
