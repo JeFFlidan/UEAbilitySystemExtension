@@ -33,7 +33,7 @@ const UInputAction* UMvInputConfig::GetInputActionByTag(const TArray<FMvInputAct
 
 	if (bLogNotFound)
 	{
-		UE_LOG(LogMv, Error, TEXT("Can't find InputAction for InputTag [%s] on InputConfig [%s]."), *InputTag.ToString(), *GetNameSafe(this));
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("Can't find InputAction for InputTag [%s] on InputConfig [%s]."), *InputTag.ToString(), *GetNameSafe(this));
 	}
 
 	return nullptr;
