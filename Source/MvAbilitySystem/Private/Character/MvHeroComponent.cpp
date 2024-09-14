@@ -1,6 +1,6 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
-#include "Character/MvAbilityInputBindingComponent.h"
+#include "Character/MvHeroComponent.h"
 #include "Character/MvPawnExtensionComponent.h"
 #include "Character/MvPawnData.h"
 #include "Input/MvInputConfig.h"
@@ -9,65 +9,66 @@
 #include "MvLogChannels.h"
 
 #include "EnhancedInputSubsystems.h"
+#include "Components/GameFrameworkComponentManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(MvAbilityInputBindingComponent)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(MvHeroComponent)
 
-UMvAbilityInputBindingComponent::UMvAbilityInputBindingComponent(const FObjectInitializer& ObjectInitializer)
+UMvHeroComponent::UMvHeroComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 
 }
 
-void UMvAbilityInputBindingComponent::AddAdditionalInputConfig(MvInputConfig* InputConfig)
+void UMvHeroComponent::AddAdditionalInputConfig(const UMvInputConfig* InputConfig)
 {
 }
 
-void UMvAbilityInputBindingComponent::RemoveAdditionalInputConfig(MvInputConfig* InputConfig)
+void UMvHeroComponent::RemoveAdditionalInputConfig(const UMvInputConfig* InputConfig)
 {
 }
 
-bool UMvAbilityInputBindingComponent::IsReadyToBindInputs() const
-{
-	return false;
-}
-
-bool UMvAbilityInputBindingComponent::CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const
+bool UMvHeroComponent::IsReadyToBindInputs() const
 {
 	return false;
 }
 
-void UMvAbilityInputBindingComponent::HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState)
+bool UMvHeroComponent::CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const
+{
+	return false;
+}
+
+void UMvHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState)
 {
 }
 
-void UMvAbilityInputBindingComponent::OnActorInitStateChanged(const FActorInitStateChangedParams& Params)
+void UMvHeroComponent::OnActorInitStateChanged(const FActorInitStateChangedParams& Params)
 {
 }
 
-void UMvAbilityInputBindingComponent::CheckDefaultInitialization()
+void UMvHeroComponent::CheckDefaultInitialization()
 {
 }
 
-void UMvAbilityInputBindingComponent::OnRegister()
+void UMvHeroComponent::OnRegister()
 {
 }
 
-void UMvAbilityInputBindingComponent::BeginPlay()
+void UMvHeroComponent::BeginPlay()
 {
 }
 
-void UMvAbilityInputBindingComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UMvHeroComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 }
 
-void UMvAbilityInputBindingComponent::InitializePlayerInput(UInputComponent* PlayerInputComponent)
+void UMvHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputComponent)
 {
 	check(PlayerInputComponent);
 
 	const APawn* Pawn = GetPawn<APawn>();
 	if (!Pawn)
 	{
-		UE_LOG(LogMvAbilitySystem, Warning, TEXT("Failed to get Pawn in UMvAbilityInputBindingComponent::InitializePlayerInput."))
+		UE_LOG(LogMvAbilitySystem, Warning, TEXT("Failed to get Pawn in UMvHeroComponent::InitializePlayerInput."))
 		return;
 	}
 
@@ -113,12 +114,15 @@ void UMvAbilityInputBindingComponent::InitializePlayerInput(UInputComponent* Pla
 			}
 		}
 	}
+
+	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(const_cast<APlayerController*>(PlayerController), NAME_BindInputsNow);
+	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(const_cast<APawn*>(Pawn), NAME_BindInputsNow);
 }
 
-void UMvAbilityInputBindingComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
+void UMvHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
 {
 }
 
-void UMvAbilityInputBindingComponent::Input_AbilityInputTagReleased(FGameplayTag InputTag)
+void UMvHeroComponent::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 {
 }

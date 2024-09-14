@@ -9,7 +9,7 @@ class UObject;
 class UMvAbilitySystemComponent;
 class AController;
 class AMvCharacter;
-class UMvAbilityInputBindingComponent;
+class UMvHeroComponent;
 
 /**
  * 
@@ -30,7 +30,7 @@ public:
 	AMvCharacter* GetMvCharacterFromActorInfo() const;
 
 	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability")
-	UMvAbilityInputBindingComponent* GetMvAbilityInputBindingComponent() const;
+	UMvHeroComponent* GetMvAbilityInputBindingComponent() const;
 
 	void OnAbilityFailedToActivate(const FGameplayTagContainer& FailedReason) const
 	{

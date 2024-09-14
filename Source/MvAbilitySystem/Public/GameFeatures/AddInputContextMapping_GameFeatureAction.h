@@ -40,7 +40,6 @@ public:
     virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
 #endif
 
-
 private:
     UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess="true"))
     TArray<FInputMappingContextInfo> InputMappings;

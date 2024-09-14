@@ -1,6 +1,7 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
 #include "GameFeatures/AddInputContextMapping_GameFeatureAction.h"
+#include "Character/MvHeroComponent.h"
 #include "MvLogChannels.h"
 
 #include "Components/GameFrameworkComponentManager.h"
@@ -13,9 +14,9 @@
 #include "Misc/DataValidation.h"
 #endif
 
-#define LOCTEXT_NAMESPACE "MvGameFeatures"
-
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AddInputContextMapping_GameFeatureAction)
+
+#define LOCTEXT_NAMESPACE "MvGameFeatures"
 
 void UAddInputContextMapping_GameFeatureAction::OnGameFeatureRegistering()
 {
@@ -110,7 +111,7 @@ void UAddInputContextMapping_GameFeatureAction::HandleControllerExtension(AActor
 	{
 		RemoveInputMappings(Controller);
 	}
-	else if (EventName == UGameFrameworkComponentManager::NAME_ExtensionAdded || EventName == UGameFrameworkComponentManager::NAME_GameActorReady)
+	else if (EventName == UGameFrameworkComponentManager::NAME_ExtensionAdded || EventName == UMvHeroComponent::NAME_BindInputsNow)
 	{
 		AddInputMappings(Controller);
 	}

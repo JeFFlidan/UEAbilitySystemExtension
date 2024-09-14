@@ -7,33 +7,33 @@
 #include "Components/PawnComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
 
-#include "MvAbilityInputBindingComponent.generated.h"
+#include "MvHeroComponent.generated.h"
 
-class MvInputConfig;
+class UMvInputConfig;
 class UMvInputComponent;
 
 /**
  * 
  */
 UCLASS(Blueprintable, Meta = (BlueprintSpawnableComponent))
-class MVABILITYSYSTEM_API UMvAbilityInputBindingComponent : public UPawnComponent, public IGameFrameworkInitStateInterface
+class MVABILITYSYSTEM_API UMvHeroComponent : public UPawnComponent, public IGameFrameworkInitStateInterface
 {
 	GENERATED_BODY()
 	
 public:
-	UMvAbilityInputBindingComponent(const FObjectInitializer& ObjectInitializer);
+	UMvHeroComponent(const FObjectInitializer& ObjectInitializer);
 	
 	UFUNCTION(BlueprintPure, Category = "MVAS|Input Binding")
-	static UMvAbilityInputBindingComponent* FindAbilityBindingComponent(const AActor* Actor)
+	static UMvHeroComponent* FindHeroComponent(const AActor* Actor)
 	{
-		return (Actor ? Actor->FindComponentByClass< UMvAbilityInputBindingComponent>() : nullptr);
+		return (Actor ? Actor->FindComponentByClass<UMvHeroComponent>() : nullptr);
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "MVAS|Input Binding")
 	UMvInputComponent* GetMvInputComponent() const { return InputComponent; }
 
-	void AddAdditionalInputConfig(MvInputConfig* InputConfig);
-	void RemoveAdditionalInputConfig(MvInputConfig* InputConfig);
+	void AddAdditionalInputConfig(const UMvInputConfig* InputConfig);
+	void RemoveAdditionalInputConfig(const UMvInputConfig* InputConfig);
 	bool IsReadyToBindInputs() const;
 
 	inline static const FName NAME_BindInputsNow{"BindInputsNow"};

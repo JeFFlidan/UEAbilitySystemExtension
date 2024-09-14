@@ -3,7 +3,7 @@
 #include "AbilitySystem/Abilities/MvGameplayAbility.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
 #include "Character/MvCharacter.h"
-#include "Character/MvAbilityInputBindingComponent.h"
+#include "Character/MvHeroComponent.h"
 
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
@@ -49,11 +49,11 @@ AMvCharacter* UMvGameplayAbility::GetMvCharacterFromActorInfo() const
     return (CurrentActorInfo ? Cast<AMvCharacter>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
 }
 
-UMvAbilityInputBindingComponent* UMvGameplayAbility::GetMvAbilityInputBindingComponent() const
+UMvHeroComponent* UMvGameplayAbility::GetMvAbilityInputBindingComponent() const
 {
     if (CurrentActorInfo)
     {
-        return UMvAbilityInputBindingComponent::FindAbilityBindingComponent(CurrentActorInfo->AvatarActor.Get());
+        return UMvHeroComponent::FindHeroComponent(CurrentActorInfo->AvatarActor.Get());
     }
     return nullptr;
 }

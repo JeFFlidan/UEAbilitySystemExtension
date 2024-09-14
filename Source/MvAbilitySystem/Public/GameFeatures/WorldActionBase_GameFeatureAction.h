@@ -7,6 +7,9 @@
 
 #include "WorldActionBase_GameFeatureAction.generated.h"
 
+class APlayerController;
+struct FComponentRequestHandle;
+
 UCLASS(Abstract)
 class UWorldActionBase_GameFeatureAction : public UGameFeatureAction
 {
