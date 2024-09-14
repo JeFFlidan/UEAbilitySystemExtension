@@ -23,12 +23,13 @@ class MVABILITYSYSTEM_API UMvAbilityInputBindingComponent : public UPawnComponen
 public:
 	UMvAbilityInputBindingComponent(const FObjectInitializer& ObjectInitializer);
 	
-	UFUNCTION(BlueprintPure, Category="MVAS|Input Binding")
+	UFUNCTION(BlueprintPure, Category = "MVAS|Input Binding")
 	static UMvAbilityInputBindingComponent* FindAbilityBindingComponent(const AActor* Actor)
 	{
 		return (Actor ? Actor->FindComponentByClass< UMvAbilityInputBindingComponent>() : nullptr);
 	}
 
+	UFUNCTION(BlueprintCallable, Category = "MVAS|Input Binding")
 	UMvInputComponent* GetMvInputComponent() const { return InputComponent; }
 
 	void AddAdditionalInputConfig(MvInputConfig* InputConfig);
