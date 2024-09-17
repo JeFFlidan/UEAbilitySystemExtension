@@ -16,6 +16,12 @@ EDataValidationResult UMvGameplayConfig::IsDataValid(FDataValidationContext& Con
 {
 	EDataValidationResult Result = CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid);
 
+	if (!PawnData)
+	{
+		Result = EDataValidationResult::Invalid;
+		Context.AddError(LOCTEXT("PawnDataIsNull", "Pawn Data field is empty."));
+	}
+
 	int32 EntryIndex = 0;
 	for (const FString& FeatureName : GameFeatureToEnable)
 	{

@@ -18,7 +18,7 @@ class MVABILITYSYSTEM_API UMvGameplayConfig : public UPrimaryDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
-	TSoftObjectPtr<UMvPawnData> PawnData;
+	TObjectPtr<UMvPawnData> PawnData;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	TArray<FString> GameFeatureToEnable;

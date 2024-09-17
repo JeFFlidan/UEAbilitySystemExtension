@@ -4,7 +4,6 @@
 #include "GameModes/MvGameplayConfig.h"
 #include "MvLogChannels.h"
 
-#include "Engine/AssetManager.h"
 #include "GameFeaturesSubsystem.h"
 #include "GameFeatureAction.h"
 
@@ -14,11 +13,9 @@ UMvGameplayConfigManagerComponent::UMvGameplayConfigManagerComponent(const FObje
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UMvGameplayConfigManagerComponent::SetCurrentGameplayConfig(const FPrimaryAssetId& GameplayConfigId)
+void UMvGameplayConfigManagerComponent::SetCurrentGameplayConfig(const TSoftClassPtr<UMvGameplayConfig>& GameplayConfigClass)
 {
-	UAssetManager& AssetManager = UAssetManager::Get();
-	FSoftObjectPath AssetPath = AssetManager.GetPrimaryAssetPath(GameplayConfigId);
-	TSubclassOf<UMvGameplayConfig> AssetClass = Cast<UClass>(AssetPath.TryLoad());
+	TSubclassOf<UMvGameplayConfig> AssetClass = Cast<UClass>(GameplayConfigClass.ToSoftObjectPath().TryLoad());
 	check(AssetClass);
 	const UMvGameplayConfig* GameplayConfig = GetDefault<UMvGameplayConfig>(AssetClass);
 

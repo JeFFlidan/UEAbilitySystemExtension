@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Components/ActorComponent.h"
+#include "Components/GameStateComponent.h"
 #include "MvGameplayConfigManagerComponent.generated.h"
 
 class UMvGameplayConfig;
@@ -23,7 +23,7 @@ enum class EMvGameplayConfigLoadState : uint8
 };
 
 UCLASS()
-class MVABILITYSYSTEM_API UMvGameplayConfigManagerComponent : public UActorComponent
+class MVABILITYSYSTEM_API UMvGameplayConfigManagerComponent : public UGameStateComponent
 {
 	GENERATED_BODY()
 
@@ -32,7 +32,7 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
-	void SetCurrentGameplayConfig(const FPrimaryAssetId& GameplayConfigId);
+	void SetCurrentGameplayConfig(const TSoftClassPtr<UMvGameplayConfig>& GameplayConfigClass);
 	void CallOrRegister_OnGameplayConfigLoaded(FOnMvGameplayConfigLoaded::FDelegate&& Delegate);
 
 	// Uses check to validate some info, so be careful when calling this method and choose the appropriate place.
