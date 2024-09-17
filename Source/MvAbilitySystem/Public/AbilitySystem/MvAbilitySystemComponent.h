@@ -20,7 +20,7 @@ class MVABILITYSYSTEM_API UMvAbilitySystemComponent : public UAbilitySystemCompo
 public:
 	UMvAbilitySystemComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	virtual UGameplayAbility* GetActiveComboAbility() const;
+	virtual UGameplayAbility* GetActiveComboAbility() const override;
 
 	virtual void IncrementComboIndex() override { if (bWindowComboAttack) ++ComboIndex; }
 	virtual int32 GetComboIndex() const override { return ComboIndex; }
@@ -33,6 +33,9 @@ public:
 	virtual bool IsRequestTriggerCombo() const override { return bRequestTriggerCombo; }
 	virtual void OpenComboWindow() override { bWindowComboAttack = true; } 
 	virtual void CloseComboWindow() override;
+
+	void AbilityInputTagPressed(const FGameplayTag& InputTag);
+	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 
 protected:
 	UPROPERTY()

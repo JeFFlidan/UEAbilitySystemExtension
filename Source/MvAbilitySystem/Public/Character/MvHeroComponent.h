@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include "GameFeatures/AddInputContextMapping_GameFeatureAction.h"
-
 #include "Components/PawnComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
+#include "GameFeatures/AddInputContextMapping_GameFeatureAction.h" 
 
 #include "MvHeroComponent.generated.h"
 
 class UMvInputConfig;
 class UMvInputComponent;
+class UEnhancedInputLocalPlayerSubsystem;
 
 /**
  * 
@@ -34,7 +34,7 @@ public:
 
 	void AddAdditionalInputConfig(const UMvInputConfig* InputConfig);
 	void RemoveAdditionalInputConfig(const UMvInputConfig* InputConfig);
-	bool IsReadyToBindInputs() const;
+	bool IsReadyToBindInputs() const { return bReadyToBindInputs; }
 
 	inline static const FName NAME_BindInputsNow{"BindInputsNow"};
 	inline static const FName NAME_ActorFeatureName{"InputBinding"};
@@ -63,4 +63,6 @@ protected:
 
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
+
+	UEnhancedInputLocalPlayerSubsystem* GetInputSubsystem();
 };

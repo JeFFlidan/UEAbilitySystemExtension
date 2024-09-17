@@ -2,9 +2,13 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "AttributeSet.h"
+#include "GameplayTagContainer.h"
+
 #include "MvAbilitySet.generated.h"
+
+class UObject;
 
 /**
  * 
