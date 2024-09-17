@@ -6,8 +6,9 @@
 #include "Components/GameFrameworkInitStateInterface.h"
 #include "MvPawnExtensionComponent.generated.h"
 
-class UMvPawnData;
 class UObject;
+class UMvPawnData;
+class UMvAbilitySystemComponent;
 
 /**
  * 
@@ -29,6 +30,15 @@ public:
 	const UMvPawnData* GetPawnData() const { return PawnData; }
 	void SetPawnData(const UMvPawnData* InPawnData);
 
+	UFUNCTION(BlueprintPure, Category = "MVAS|Pawn")
+	UMvAbilitySystemComponent* GetMvAbilitySystemComponent() const { return AbilitySystemComponent; }
+
+	void InitializeAbilitySystem(UMvAbilitySystemComponent* InAbilitySystemComponent, AActor* InOwner);
+	void UninitializeAbilitySystem();
+
+	void OnAbilitySystemInitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate Delegate);
+	void OnAbilitySystemUninitialized_RegisterAndCall(FSimpleMulticastDelegate::FDelegate Delegate);
+
 	inline static const FName NAME_ActorFeatureName{"MvPawnExtension"};
 
 	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
@@ -40,6 +50,12 @@ public:
 protected:
 	UPROPERTY(EditInstanceOnly, Category = "MVAS|Pawn")
 	TObjectPtr<const UMvPawnData> PawnData{nullptr};
+
+	UPROPERTY(Transient)
+	TObjectPtr<UMvAbilitySystemComponent> AbilitySystemComponent;
+
+	FSimpleMulticastDelegate OnAbilitySystemInitialized;
+	FSimpleMulticastDelegate OnAbilitySystemUninitialized;
 
 	virtual void OnRegister() override;
 	virtual void BeginPlay() override;

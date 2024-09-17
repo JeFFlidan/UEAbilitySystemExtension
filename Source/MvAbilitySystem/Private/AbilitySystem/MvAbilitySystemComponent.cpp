@@ -20,3 +20,13 @@ void UMvAbilitySystemComponent::CloseComboWindow()
 	bNextComboAbilityActivated = false;
 	bShouldTriggerCombo = false;
 }
+
+void UMvAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
+{
+	
+}
+
+void UMvAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
+{
+	
+}

@@ -3,6 +3,7 @@
 #include "Player/MvPlayerState.h"
 #include "GameModes/MvGameMode.h"
 #include "GameModes/MvGameplayConfigManagerComponent.h"
+#include "AbilitySystem/MvAbilitySystemComponent.h"
 #include "MvLogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvPlayerState)
@@ -10,6 +11,7 @@
 AMvPlayerState::AMvPlayerState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	AbilitySystemComponent = CreateDefaultSubobject<UMvAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 }
 
 void AMvPlayerState::PreInitializeComponents()
@@ -20,6 +22,9 @@ void AMvPlayerState::PreInitializeComponents()
 void AMvPlayerState::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	check(AbilitySystemComponent);
+	AbilitySystemComponent->InitAbilityActorInfo(this, GetPawn());
 
 	UWorld* World = GetWorld();
 	if (World && World->IsGameWorld())
@@ -32,6 +37,11 @@ void AMvPlayerState::PostInitializeComponents()
 
 		ConfigManager->CallOrRegister_OnGameplayConfigLoaded(FOnMvGameplayConfigLoaded::FDelegate::CreateUObject(this, &ThisClass::OnGameplayConfigLoaded));
 	}
+}
+
+UAbilitySystemComponent* AMvPlayerState::GetAbilitySystemComponent() const
+{
+	return GetMvAbilitySystemComponent();
 }
 
 void AMvPlayerState::SetPawnData(const UMvPawnData* InPawnData)
