@@ -2,6 +2,9 @@
 
 #include "Character/MvPawnExtensionComponent.h"
 #include "Character/MvPawnData.h"
+#include "GameModes/MvGameplayConfigManagerComponent.h"
+#include "GameModes/MvGameMode.h"
+#include "Player/MvPlayerState.h"
 #include "MvLogChannels.h"
 #include "MvGameplayTags.h"
 
@@ -126,6 +129,7 @@ void UMvPawnExtensionComponent::OnAbilitySystemUninitialized_RegisterAndCall(
 bool UMvPawnExtensionComponent::CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const
 {
 	check(Manager);
+	UE_LOG(LogMvAbilitySystem, Log, TEXT("Outside if %s %s"), *CurrentState.ToString(), *DesiredState.ToString());
 
 	APawn* Pawn = GetPawn<APawn>();
 	if (!CurrentState.IsValid() && DesiredState == MvGameplayTags::InitState_Spawned)
@@ -141,7 +145,7 @@ bool UMvPawnExtensionComponent::CanChangeInitState(UGameFrameworkComponentManage
 		{
 			return false;
 		}
-
+		
 		if (!GetController<AController>())
 		{
 			return false;
@@ -203,7 +207,7 @@ void UMvPawnExtensionComponent::OnRegister()
 	Pawn->GetComponents(StaticClass(), Components);
 	ensureAlwaysMsgf(Components.Num() == 1, TEXT("Only one MvPawnExtensionComponent must exist on %s"),
 		*GetNameSafe(GetOwner()));
-
+	
 	RegisterInitStateFeature();
 }
 
@@ -213,6 +217,9 @@ void UMvPawnExtensionComponent::BeginPlay()
 
 	BindOnActorInitStateChanged(NAME_None, FGameplayTag(), false);
 
+	AMvPlayerState* MvPlayerState = GetPlayerState<AMvPlayerState>();
+	MvPlayerState->CallOrRegister_OnPawnDataLoaded(FOnPawnDataLoaded::FDelegate::CreateUObject(this, &ThisClass::OnPawnDataLoaded));
+
 	ensure(TryToChangeInitState(MvGameplayTags::InitState_Spawned));
 	CheckDefaultInitialization();
 }
@@ -220,4 +227,11 @@ void UMvPawnExtensionComponent::BeginPlay()
 void UMvPawnExtensionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void UMvPawnExtensionComponent::OnPawnDataLoaded(const UMvPawnData* InPawnData)
+{
+	check(InPawnData);
+
+	SetPawnData(InPawnData);
 }

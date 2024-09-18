@@ -47,7 +47,16 @@ private:
     TArray<TSharedPtr<FComponentRequestHandle>> ExtensionRequestHandles;
     TArray<TWeakObjectPtr<APlayerController>> ControllersAddedTo;
 
+    FDelegateHandle RegisterInputContextMappingsForGameInstanceHandle;
+
     virtual void AddToWorld(const FWorldContext& WorldContext, const FGameFeatureStateChangeContext& ChangeContext) override;
+
+    void RegisterInputMappingContexts();
+    void RegisterInputContextMappingsForGameInstance(UGameInstance* GameInstance);
+    void RegisterInputMappingContextsForLocalPlayer(ULocalPlayer* LocalPlayer);
+    void UnregisterInputMappingContexts();
+    void UnregisterInputContextMappingsForGameInstance(UGameInstance* GameInstance);
+    void UnregisterInputMappingContextsForLocalPlayer(ULocalPlayer* LocalPlayer);
 
     void Reset();
     void HandleControllerExtension(AActor* InActor, FName EventName);

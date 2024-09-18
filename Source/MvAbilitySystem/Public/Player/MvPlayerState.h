@@ -13,6 +13,8 @@ class UMvPawnData;
 class UMvGameplayConfig;
 class UMvAbilitySystemComponent;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPawnDataLoaded, const UMvPawnData*);
+
 /**
  * 
  */
@@ -33,11 +35,15 @@ public:
 	void SetPawnData(const UMvPawnData* InPawnData);
 	const UMvPawnData* GetPawnData() const { return PawnData; }
 
+	void CallOrRegister_OnPawnDataLoaded(FOnPawnDataLoaded::FDelegate&& Delegate);
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "MVAS|PlayerState")
 	TObjectPtr<UMvAbilitySystemComponent> AbilitySystemComponent;
 	
 	TObjectPtr<const UMvPawnData> PawnData;
+
+	FOnPawnDataLoaded OnPawnDataLoaded;
 
 private:
 	void OnGameplayConfigLoaded(const UMvGameplayConfig* GameplayConfig);

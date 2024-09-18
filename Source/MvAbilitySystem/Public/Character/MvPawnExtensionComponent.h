@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "MvPawnData.h"
 #include "Components/PawnComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
 #include "MvPawnExtensionComponent.generated.h"
@@ -9,6 +10,7 @@
 class UObject;
 class UMvPawnData;
 class UMvAbilitySystemComponent;
+class UMvGameplayConfig;
 
 /**
  * 
@@ -60,4 +62,6 @@ protected:
 	virtual void OnRegister() override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	void OnPawnDataLoaded(const UMvPawnData* InPawnData);
 };

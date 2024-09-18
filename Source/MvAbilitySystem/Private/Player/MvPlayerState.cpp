@@ -1,9 +1,11 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
 #include "Player/MvPlayerState.h"
+#include "Character/MvPawnData.h"
 #include "GameModes/MvGameMode.h"
 #include "GameModes/MvGameplayConfigManagerComponent.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
+#include "AbilitySystem/MvAbilitySet.h"
 #include "MvLogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvPlayerState)
@@ -46,7 +48,34 @@ UAbilitySystemComponent* AMvPlayerState::GetAbilitySystemComponent() const
 
 void AMvPlayerState::SetPawnData(const UMvPawnData* InPawnData)
 {
+	if (PawnData)
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("Trying to set PawnData [%s] on player state [%s] that already has valid PawnData [%s]."),
+			*GetNameSafe(InPawnData), *GetNameSafe(this), *GetNameSafe(PawnData));
+		return;
+	}
+	
 	PawnData = InPawnData;
+
+	for (const UMvAbilitySet* AbilitySet : PawnData->AbilitySets)
+	{
+		if (AbilitySet)
+		{
+			AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, nullptr);
+		}
+	}
+}
+
+void AMvPlayerState::CallOrRegister_OnPawnDataLoaded(FOnPawnDataLoaded::FDelegate&& Delegate)
+{
+	if (PawnData)
+	{
+		Delegate.Execute(PawnData);
+	}
+	else
+	{
+		OnPawnDataLoaded.Add(MoveTemp(Delegate));
+	}
 }
 
 void AMvPlayerState::OnGameplayConfigLoaded(const UMvGameplayConfig* GameplayConfig)

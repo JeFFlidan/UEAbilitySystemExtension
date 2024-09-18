@@ -36,20 +36,17 @@ public:
 
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
+	void ClearAbilityInput();
 
 protected:
-	UPROPERTY()
 	int32 ComboIndex;
-	
-	UPROPERTY()
 	bool bWindowComboAttack;
-
-	UPROPERTY()
 	bool bRequestTriggerCombo;
-
-	UPROPERTY()
 	bool bNextComboAbilityActivated;
-
-	UPROPERTY()
 	bool bShouldTriggerCombo;
+
+	TArray<FGameplayAbilitySpecHandle> InputPressedSpecHandles;
+	TArray<FGameplayAbilitySpecHandle> InputReleasedSpecHandles;
+	TArray<FGameplayAbilitySpecHandle> InputHeldSpecHandles;
 };

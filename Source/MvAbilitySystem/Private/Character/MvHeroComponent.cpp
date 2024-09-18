@@ -108,7 +108,7 @@ void UMvHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Man
 	{
 		APawn* Pawn = GetPawn<APawn>();
 		AMvPlayerState* PlayerState = GetPlayerState<AMvPlayerState>();
-
+		UE_LOG(LogMvAbilitySystem, Log, TEXT("In if"))
 		if (!ensure(Pawn && PlayerState))
 		{
 			return;

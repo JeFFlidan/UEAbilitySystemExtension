@@ -7,6 +7,7 @@
 
 class APawn;
 class UMvInputConfig;
+class UMvAbilitySet;
 
 /**
  * 
@@ -20,6 +21,9 @@ public:
 	// Class to instantiate for this pawn (should usually derive from AMvPawn or AMvCharacter).
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MVAS|Pawn")
 	TSubclassOf<APawn> PawnClass{nullptr};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MVAS|Abilities")
+	TArray<TObjectPtr<UMvAbilitySet>> AbilitySets;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MVAS|Input")
 	TObjectPtr<UMvInputConfig> InputConfig{nullptr};

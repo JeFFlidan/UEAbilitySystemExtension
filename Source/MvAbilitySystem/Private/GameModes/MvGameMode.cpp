@@ -4,6 +4,7 @@
 #include "GameModes/MvWorldSettings.h"
 #include "GameModes/MvGameplayConfigManagerComponent.h"
 #include "Character/MvPawnData.h"
+#include "Character/MvPawnExtensionComponent.h"
 #include "Player/MvPlayerState.h"
 #include "MvLogChannels.h"
 
