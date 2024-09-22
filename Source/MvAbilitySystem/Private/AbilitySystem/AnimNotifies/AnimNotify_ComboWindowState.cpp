@@ -1,13 +1,10 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
-
 #include "AbilitySystem/AnimNotifies/AnimNotify_ComboWindowState.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
-#include "Player/MvPlayerState.h"
+#include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
+#include "Character/MvCharacter.h"
 #include "MvLogChannels.h"
-
-#include "Kismet/GameplayStatics.h"
-#include "Abilities/GameplayAbility.h"
 
 UAnimNotify_ComboWindowState::UAnimNotify_ComboWindowState(const FObjectInitializer& ObjInitializer)
 	:Super(ObjInitializer)
@@ -35,7 +32,10 @@ void UAnimNotify_ComboWindowState::NotifyBegin(
 		return;
 	}
 	
-	AbilitySystemComponent = GetMvAbilitySystemComponent();
+	if (AMvCharacter* Character = Cast<AMvCharacter>(MeshComp->GetOwner()))
+	{
+		AbilitySystemComponent = Character->GetMvAbilitySystemComponent();
+	}
 
 	if (AbilitySystemComponent)
 	{
@@ -52,7 +52,7 @@ void UAnimNotify_ComboWindowState::NotifyEnd(
 
 	if (AbilitySystemComponent)
 	{
-		if (!AbilitySystemComponent->IsActiveNextCombo() && bEndCombo)
+		if (!AbilitySystemComponent->IsActiveNextCombo() && AbilitySystemComponent->IsLastComboMontage())
 		{
 			UE_LOG(LogMvAbilitySystem, Display, TEXT("UAnimNotify_ComboWindowState::NotifyEnd(): Reset combo."))
 			AbilitySystemComponent->ResetCombo();
@@ -74,20 +74,20 @@ void UAnimNotify_ComboWindowState::NotifyTick(
 	}
 
 	if (AbilitySystemComponent->IsOpenComboWindow() && AbilitySystemComponent->IsShouldTriggerCombo()
-		&& AbilitySystemComponent->IsRequestTriggerCombo() && !bEndCombo)
+		&& AbilitySystemComponent->IsRequestTriggerCombo() && !AbilitySystemComponent->IsLastComboMontage())
 	{
 		if (AbilitySystemComponent->IsActiveNextCombo())
 		{
 			return;
 		}
 		
-		const UGameplayAbility* Ability = AbilitySystemComponent->GetActiveComboAbility();
+		const UMvGameplayAbility_Active_Combat* Ability = AbilitySystemComponent->GetActiveCombatAbility();
 		if (!Ability)
 		{
 			UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyTick(): Ability is null."))
 			return;
 		}
-
+		
 		if (AbilitySystemComponent->TryActivateAbilityByClass(Ability->GetClass()))
 		{
 			AbilitySystemComponent->ActivateNextCombo();
@@ -98,10 +98,4 @@ void UAnimNotify_ComboWindowState::NotifyTick(
 				*GetNameSafe(Ability));
 		}
 	}
-}
-
-UMvAbilitySystemComponent* UAnimNotify_ComboWindowState::GetMvAbilitySystemComponent() const
-{
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	return PlayerController->GetPlayerState<AMvPlayerState>()->GetMvAbilitySystemComponent();
 }

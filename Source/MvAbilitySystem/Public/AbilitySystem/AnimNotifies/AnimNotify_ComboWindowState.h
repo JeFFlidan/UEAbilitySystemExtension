@@ -41,6 +41,4 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UMvAbilitySystemComponent> AbilitySystemComponent;
-
-	UMvAbilitySystemComponent* GetMvAbilitySystemComponent() const;
 };

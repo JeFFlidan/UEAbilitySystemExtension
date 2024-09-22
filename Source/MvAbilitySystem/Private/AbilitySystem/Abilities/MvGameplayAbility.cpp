@@ -10,6 +10,11 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvGameplayAbility)
 
+UMvGameplayAbility::UMvGameplayAbility(const FObjectInitializer& ObjInitializer)
+    : Super(ObjInitializer)
+{
+}
+
 UMvAbilitySystemComponent* UMvGameplayAbility::GetMvAbilitySystemComponentFromActorInfo() const
 {
     return (CurrentActorInfo ? Cast <UMvAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()) : nullptr);

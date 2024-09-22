@@ -7,7 +7,7 @@
 
 class UMvGameplayAbility;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMvPlayMontageAndWaitForEventDelegate, FGameplayTag, EventTag, FGameplayEventData, EventData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMvPlayMontageAndWaitForEventDelegate, FGameplayTag, EventTag, const FGameplayEventData&, EventData);
 
 UCLASS()
 class UAbilityTask_PlayMontageAndWaitForEvent : public UAbilityTask

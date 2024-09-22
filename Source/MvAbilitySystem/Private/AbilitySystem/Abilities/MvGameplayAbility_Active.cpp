@@ -1,6 +1,7 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active.h"
+#include "AbilitySystem/Tasks/AbilityTask_PlayMontageAndWaitForEvent.h"
 #include "MvLogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvGameplayAbility_Active)
@@ -81,4 +82,34 @@ bool UMvGameplayAbility_Active::DoesAbilitySatisfyTagRequirements(const UAbility
 {
     // TODO Replace with custom logic
     return Super::DoesAbilitySatisfyTagRequirements(AbilitySystemComponent, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
+void UMvGameplayAbility_Active::PlayMontageWaitEvent(UAnimMontage* AnimMontage, const float RateMontage, const FName& StartSection, const bool bStopWhenAbilityEnds)
+{
+    UAbilityTask_PlayMontageAndWaitForEvent* Task = UAbilityTask_PlayMontageAndWaitForEvent::PlayMontageAndWaitForEvent(
+        this, NAME_None, AnimMontage, WaitMontageEvents, RateMontage, StartSection, bStopWhenAbilityEnds);
+
+    Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
+    Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
+    Task->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
+    Task->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
+    Task->OnEventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
+
+    Task->ReadyForActivation();
+}
+
+void UMvGameplayAbility_Active::OnMontageCompleted(FGameplayTag EventTag, const FGameplayEventData& EventData)
+{
+    BP_OnMontageCompleted(EventTag, EventData);
+    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
+}
+
+void UMvGameplayAbility_Active::OnMontageCancelled(FGameplayTag EventTag, const FGameplayEventData& EventData)
+{
+    BP_OnMontageCancelled(EventTag, EventData);
+    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, true);
+}
+
+void UMvGameplayAbility_Active::OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData)
+{
 }

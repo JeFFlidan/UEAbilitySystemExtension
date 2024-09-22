@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility.h"
 #include "MvGameplayAbility_Active.generated.h"
 
+class UObject;
+class UAnimMontage;
 
 /**
  * Defines how an ability is activated
@@ -39,6 +40,21 @@ enum class EMvAbilityActivationGroup : uint8
 /**
  * 
  */
+USTRUCT(BlueprintType)
+struct FMvAbilityMontageInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Animation Info")
+	TSoftObjectPtr<UAnimMontage> Montage;
+
+	UPROPERTY(EditAnywhere, Category = "Animation Info")
+	float Speed;
+};
+
+/**
+ * 
+ */
 UCLASS()
 class MVABILITYSYSTEM_API UMvGameplayAbility_Active : public UMvGameplayAbility
 {
@@ -57,6 +73,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MVAS|Ability Activation")
 	EMvAbilityActivationGroup ActivationGroup;
 
+	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Events")
+	FGameplayTagContainer WaitMontageEvents;
+
 	// If true, extra information will be logged when this ability is cancelled. For tracking bugs only
 	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Advanced")
 	bool bLogCancelation;
@@ -70,4 +89,25 @@ protected:
 	virtual FGameplayEffectContextHandle MakeEffectContext(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo) const override;
 	virtual void ApplyAbilityTagsToGameplayEffectSpec(FGameplayEffectSpec& Spec, FGameplayAbilitySpec* AbilitySpec) const override;
 	virtual bool DoesAbilitySatisfyTagRequirements(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
+
+	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability Animations")
+	void PlayMontageWaitEvent(UAnimMontage* AnimMontage, const float RateMontage = 1.0f, const FName& StartSection = NAME_None, const bool bStopWhenAbilityEnds = true);
+	
+	UFUNCTION()
+	virtual void OnMontageCompleted(FGameplayTag EventTag, const FGameplayEventData& EventData);
+
+	UFUNCTION()
+	virtual void OnMontageCancelled(FGameplayTag EventTag, const FGameplayEventData& EventData);
+
+	UFUNCTION()
+	virtual void OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "MVAS|Events")
+	void BP_OnMontageCompleted(FGameplayTag EventTag, const FGameplayEventData& EventData);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "MVAS|Events")
+	void BP_OnMontageCancelled(FGameplayTag EventTag, const FGameplayEventData& EventData);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "MVAS|Events")
+	void BP_OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData);
 };

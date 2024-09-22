@@ -20,6 +20,8 @@ class MVABILITYSYSTEM_API UMvGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 	
 public:
+	UMvGameplayAbility(const FObjectInitializer& ObjInitializer = FObjectInitializer::Get());
+	
 	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability")
 	UMvAbilitySystemComponent* GetMvAbilitySystemComponentFromActorInfo() const;
 

@@ -235,7 +235,7 @@ void UAbilityTask_PlayMontageAndWaitForEvent::OnMontageEnded(UAnimMontage* Monta
 			OnCompleted.Broadcast(FGameplayTag(), FGameplayEventData());
 		}
 	}
-
+ 
 	EndTask();
 }
 
