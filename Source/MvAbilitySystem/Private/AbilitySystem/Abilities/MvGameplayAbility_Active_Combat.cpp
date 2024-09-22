@@ -1,10 +1,9 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
-
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
-
-#include "MvLogChannels.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(MvGameplayAbility_Active_Combat)
 
 void UMvGameplayAbility_Active_Combat::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
