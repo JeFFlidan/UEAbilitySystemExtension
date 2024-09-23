@@ -90,7 +90,7 @@ void UMvGameplayAbility_Active::PlayMontageWaitEvent(UAnimMontage* AnimMontage, 
         this, NAME_None, AnimMontage, WaitMontageEvents, RateMontage, StartSection, bStopWhenAbilityEnds);
 
     Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
-    Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
+    Task->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageCompleted);
     Task->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
     Task->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
     Task->OnEventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
@@ -98,18 +98,19 @@ void UMvGameplayAbility_Active::PlayMontageWaitEvent(UAnimMontage* AnimMontage, 
     Task->ReadyForActivation();
 }
 
-void UMvGameplayAbility_Active::OnMontageCompleted(FGameplayTag EventTag, const FGameplayEventData& EventData)
+void UMvGameplayAbility_Active::OnMontageCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
     BP_OnMontageCompleted(EventTag, EventData);
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
 }
 
-void UMvGameplayAbility_Active::OnMontageCancelled(FGameplayTag EventTag, const FGameplayEventData& EventData)
+void UMvGameplayAbility_Active::OnMontageCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
 {
     BP_OnMontageCancelled(EventTag, EventData);
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, true);
 }
 
-void UMvGameplayAbility_Active::OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData)
+void UMvGameplayAbility_Active::OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData)
 {
+    BP_OnEventReceived(EventTag, EventData);
 }

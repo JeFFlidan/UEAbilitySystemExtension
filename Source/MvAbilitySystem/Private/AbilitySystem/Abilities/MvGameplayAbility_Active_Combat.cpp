@@ -2,8 +2,15 @@
 
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
+#include "MvLogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvGameplayAbility_Active_Combat)
+
+UMvGameplayAbility_Active_Combat::UMvGameplayAbility_Active_Combat(const FObjectInitializer& ObjectInitializer)
+	:  Super(ObjectInitializer)
+{
+	
+}
 
 void UMvGameplayAbility_Active_Combat::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -43,18 +50,19 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 		
 		const FMvAbilityMontageInfo& MontageInfo = Montages[ComboIndex];
 
-		if (MontageInfo.Montage.IsNull())
+		if (MontageInfo.Montage.IsValid())
 		{
-			// Temp solution. Must be moved to bundle loading in the future.
-			MontageInfo.Montage.ToSoftObjectPath().TryLoad();
+			CurrentAnimMontage = MontageInfo.Montage.Get();
+			PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
 		}
-
-		CurrentAnimMontage = MontageInfo.Montage.Get();
-		PlayMontageWaitEvent(MontageInfo.Montage.Get(), MontageInfo.Speed);
+		else
+		{
+			UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvGameplayAbility_Active_Combat::ActivateAbility(): Montage is not loaded."))
+		}
 	}
 }
 
-void UMvGameplayAbility_Active_Combat::OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData)
+void UMvGameplayAbility_Active_Combat::OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	Super::OnEventReceived(EventTag, EventData);
 

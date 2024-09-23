@@ -2,15 +2,16 @@
 
 #include "GameFeatures/AddInputContextMapping_GameFeatureAction.h"
 #include "Character/MvHeroComponent.h"
+#include "System/MvAssetManager.h"
 #include "MvLogChannels.h"
 
 #include "Components/GameFrameworkComponentManager.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 #include "Engine/GameInstance.h"
-#include "Engine/AssetManager.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
 
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
@@ -48,6 +49,16 @@ void UAddInputContextMapping_GameFeatureAction::OnGameFeatureUnregistering()
 	UnregisterInputMappingContexts();
 	Super::OnGameFeatureUnregistering();
 }
+
+#if WITH_EDITORONLY_DATA
+void UAddInputContextMapping_GameFeatureAction::AddAdditionalAssetBundleData(FAssetBundleData& AssetBundleData)
+{
+	for (const FInputMappingContextInfo& Entry : InputMappings)
+	{
+		AssetBundleData.AddBundleAsset(FMvBundles::GameplayCore, Entry.InputMapping.ToSoftObjectPath().GetAssetPath());
+	}
+}
+#endif
 
 #if WITH_EDITOR
 EDataValidationResult UAddInputContextMapping_GameFeatureAction::IsDataValid(FDataValidationContext& Context) const
@@ -126,7 +137,15 @@ void UAddInputContextMapping_GameFeatureAction::RegisterInputMappingContextsForL
 			{
 				for (const FInputMappingContextInfo& Entry : InputMappings)
 				{
-					// TODO
+					if (!Entry.bRegisterWithSettings)
+					{
+						continue;
+					}
+
+					if (UInputMappingContext* InputMapping = UMvAssetManager::GetAsset(Entry.InputMapping))
+					{
+						Settings->RegisterInputMappingContext(InputMapping);
+					}
 				}
 			}
 		}
@@ -168,7 +187,18 @@ void UAddInputContextMapping_GameFeatureAction::UnregisterInputMappingContextsFo
 		{
 			if (UEnhancedInputUserSettings* Settings = EISubsystem->GetUserSettings())
 			{
-				// TODO remove from settings
+				for (const FInputMappingContextInfo& Entry : InputMappings)
+				{
+					if (!Entry.bRegisterWithSettings)
+					{
+						continue;
+					}
+
+					if (UInputMappingContext* InputMapping = Entry.InputMapping.Get())
+					{
+						Settings->UnregisterInputMappingContext(InputMapping);
+					}
+				}
 			}
 		}
 	}
@@ -212,26 +242,7 @@ void UAddInputContextMapping_GameFeatureAction::AddInputMappings(APlayerControll
 		{
 			for (FInputMappingContextInfo& Entry : InputMappings)
 			{
-				UInputMappingContext* MappingContext = Entry.InputMapping.Get();
-				if (!MappingContext)
-				{
-					MappingContext = Cast<UInputMappingContext>(Entry.InputMapping.ToSoftObjectPath().TryLoad());
-					if (MappingContext)
-					{
-						UE_LOG(LogMvAbilitySystem, Log, TEXT("Successfully loaded InputMappingContext %s"),
-							*GetNameSafe(MappingContext));
-					}
-					else
-					{
-						UE_LOG(LogMvAbilitySystem, Error, TEXT("Failed to load InputMappingContext %s"),
-							*GetNameSafe(MappingContext));
-						continue;
-					}
-				}
-				
-				InputSystem->AddMappingContext(MappingContext, Entry.Priority);
-
-				// TODO: Add input mapping to EnhancedInputUserSettings
+				InputSystem->AddMappingContext(Entry.InputMapping.Get(), Entry.Priority);
 			}
 		}
 		else

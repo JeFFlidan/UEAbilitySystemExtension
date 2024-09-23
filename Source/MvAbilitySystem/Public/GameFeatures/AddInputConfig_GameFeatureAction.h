@@ -30,7 +30,7 @@ private:
         TArray<TWeakObjectPtr<APawn>> PawnsAddedTo;
     };
     
-    UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess="true"))
+    UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess="true", AssetBundles="GameplayCore"))
     TArray<TSoftObjectPtr<UMvInputConfig>> InputConfigs;
 
     TMap<FGameFeatureStateChangeContext, FPerContextData> Contexts;

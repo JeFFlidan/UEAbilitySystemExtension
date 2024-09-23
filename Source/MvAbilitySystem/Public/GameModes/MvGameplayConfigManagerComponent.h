@@ -40,7 +40,9 @@ public:
 	bool IsGameplayConfigLoaded() const;
 
 private:
+	UPROPERTY()
 	TObjectPtr<const UMvGameplayConfig> CurrentGameplayConfig;
+	
 	EMvGameplayConfigLoadState LoadState = EMvGameplayConfigLoadState::Unloaded;
 
 	int32 GameFeaturePluginsLoadingCount = 0;

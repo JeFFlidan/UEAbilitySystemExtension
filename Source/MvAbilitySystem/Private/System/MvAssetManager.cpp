@@ -9,19 +9,19 @@ UMvAssetManager::UMvAssetManager()
 {
 }
 
-UMvAssetManager* UMvAssetManager::Get()
+UMvAssetManager& UMvAssetManager::Get()
 {
 	check(GEngine);
 
 	if (UMvAssetManager* AssetManager = Cast<UMvAssetManager>(GEngine->AssetManager))
 	{
-		return AssetManager;
+		return *AssetManager;
 	}
 
 	UE_LOG(LogMvAbilitySystem, Fatal, TEXT("Invalid AssetManagerClassName in DefaultEngine.ini. It must be set to UMvAssetManager or its subclass."))
 
 	// Fatal error above prevents this from being called 
-	return nullptr;
+	return *NewObject<UMvAssetManager>();
 }
 
 UObject* UMvAssetManager::SyncLoadAsset(const FSoftObjectPath& AssetPath)

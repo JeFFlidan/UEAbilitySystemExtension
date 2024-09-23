@@ -14,13 +14,15 @@ class MVABILITYSYSTEM_API UMvGameplayAbility_Active_Combat : public UMvGameplayA
 	GENERATED_BODY()
 
 public:
+	UMvGameplayAbility_Active_Combat(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData) override;
 
-	virtual void OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData) override;
+	virtual void OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData) override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Combat")

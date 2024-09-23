@@ -23,7 +23,7 @@ class MVABILITYSYSTEM_API UMvAssetManager : public UAssetManager
 public:
 	UMvAssetManager();
 
-	static UMvAssetManager* Get();
+	static UMvAssetManager& Get();
 
 	template<typename AssetType>
 	static AssetType* GetAsset(const TSoftObjectPtr<AssetType>& AssetPtr);

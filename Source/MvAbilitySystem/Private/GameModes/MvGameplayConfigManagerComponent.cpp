@@ -2,6 +2,10 @@
 
 #include "GameModes/MvGameplayConfigManagerComponent.h"
 #include "GameModes/MvGameplayConfig.h"
+#include "AbilitySystem/MvAbilitySet.h"
+#include "Character/MvPawnData.h"
+#include "System/MvAssetManager.h"
+#include "Input/MvInputConfig.h"
 #include "MvLogChannels.h"
 
 #include "GameFeaturesSubsystem.h"
@@ -59,8 +63,24 @@ void UMvGameplayConfigManagerComponent::StartGameplayConfigLoad()
 		*CurrentGameplayConfig->GetPrimaryAssetId().ToString());
 
 	LoadState = EMvGameplayConfigLoadState::Loading;
+
+	UMvAssetManager& AssetManager = UMvAssetManager::Get();
 	
-	// In the future, may be used as a complete delegate for StreamableHandle from AssetManager methods.
+	TArray<FPrimaryAssetId> BundleAssetList;
+	BundleAssetList.AddUnique(CurrentGameplayConfig->GetPrimaryAssetId());
+	
+	TArray<FName> BundlesToLoad;
+	BundlesToLoad.Add(FMvBundles::GameplayCore);
+	
+	TSharedPtr<FStreamableHandle> BundleLoadHandle = nullptr;
+	if (!BundleAssetList.IsEmpty())
+	{
+		BundleLoadHandle = AssetManager.ChangeBundleStateForPrimaryAssets(BundleAssetList, BundlesToLoad,
+			{}, false, FStreamableDelegate(), FStreamableManager::AsyncLoadHighPriority);
+	}
+
+	// TODO Think about callbacks and async loading. For now I have some troubles with initializing PawnData in ExtensionComponent
+	BundleLoadHandle->WaitUntilComplete();
 	OnGameplayConfigLoadComplete();
 }
 

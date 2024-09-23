@@ -45,11 +45,11 @@ struct FMvAbilityMontageInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Animation Info")
+	UPROPERTY(EditAnywhere, Category = "Animation Info", meta = (AssetBundles = "GameplayCore"))
 	TSoftObjectPtr<UAnimMontage> Montage;
 
 	UPROPERTY(EditAnywhere, Category = "Animation Info")
-	float Speed;
+	float Speed{1.0f};
 };
 
 /**
@@ -90,24 +90,24 @@ protected:
 	virtual void ApplyAbilityTagsToGameplayEffectSpec(FGameplayEffectSpec& Spec, FGameplayAbilitySpec* AbilitySpec) const override;
 	virtual bool DoesAbilitySatisfyTagRequirements(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
 
-	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability Animations")
+	UFUNCTION(/*BlueprintCallable, Category = "MVAS|Ability Animations"*/)
 	void PlayMontageWaitEvent(UAnimMontage* AnimMontage, const float RateMontage = 1.0f, const FName& StartSection = NAME_None, const bool bStopWhenAbilityEnds = true);
 	
 	UFUNCTION()
-	virtual void OnMontageCompleted(FGameplayTag EventTag, const FGameplayEventData& EventData);
+	virtual void OnMontageCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
 
 	UFUNCTION()
-	virtual void OnMontageCancelled(FGameplayTag EventTag, const FGameplayEventData& EventData);
+	virtual void OnMontageCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
 
 	UFUNCTION()
-	virtual void OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData);
+	virtual void OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "MVAS|Events")
-	void BP_OnMontageCompleted(FGameplayTag EventTag, const FGameplayEventData& EventData);
+	void BP_OnMontageCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "MVAS|Events")
-	void BP_OnMontageCancelled(FGameplayTag EventTag, const FGameplayEventData& EventData);
+	void BP_OnMontageCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "MVAS|Events")
-	void BP_OnEventReceived(FGameplayTag EventTag, const FGameplayEventData& EventData);
+	void BP_OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData);
 };

@@ -15,7 +15,7 @@ struct FInputMappingContextInfo
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, Category = "Input")
+    UPROPERTY(EditAnywhere, Category = "Input", meta = (AssetBundles = "GameplayCore"))
     TSoftObjectPtr<UInputMappingContext> InputMapping;
 
     UPROPERTY(EditAnywhere, Category = "Input")
@@ -35,6 +35,10 @@ public:
     virtual void OnGameFeatureActivating(FGameFeatureActivatingContext& Context) override;
     virtual void OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context) override;
     virtual void OnGameFeatureUnregistering() override;
+
+#if WITH_EDITORONLY_DATA
+    virtual void AddAdditionalAssetBundleData(FAssetBundleData& AssetBundleData) override;
+#endif
 
 #if WITH_EDITOR
     virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;

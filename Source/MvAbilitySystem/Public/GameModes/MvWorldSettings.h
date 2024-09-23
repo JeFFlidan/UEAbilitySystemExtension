@@ -20,7 +20,7 @@ public:
 	virtual void CheckForErrors() override;
 #endif
 
-	const TSoftClassPtr<UMvGameplayConfig> GetGameplayConfigClass() { return GameplayConfig; }
+	const TSoftClassPtr<UMvGameplayConfig>& GetGameplayConfigClass() { return GameplayConfig; }
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
