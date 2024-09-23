@@ -27,8 +27,8 @@ public:
 	TArray<TObjectPtr<UGameFeatureAction>> Actions;
 	
 #if WITH_EDITOR
-	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
-#endif
+virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif	
 
 #if WITH_EDITORONLY_DATA
 	virtual void UpdateAssetBundleData() override;

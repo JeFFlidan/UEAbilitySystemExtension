@@ -3,9 +3,69 @@
 #include "AbilitySystem/MvAbilitySet.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility.h"
-#include "MvLogChannels.h"
+#include "AttributeSet.h"
+
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvAbilitySet)
+
+#define LOCTEXT_NAMESPACE "MvAbilitySet"
+
+void FMvAbilitySet_GrantedHandles::AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle)
+{
+	if (Handle.IsValid())
+	{
+		AbilitySpecHandles.Add(Handle);
+	}
+}
+
+void FMvAbilitySet_GrantedHandles::AddGameplayEffectHandle(const FActiveGameplayEffectHandle& Handle)
+{
+	if (Handle.IsValid())
+	{
+		GameplayEffectHandles.Add(Handle);
+	}
+}
+
+void FMvAbilitySet_GrantedHandles::AddAttributeSet(UAttributeSet* Set)
+{
+	if (Set)
+	{
+		AttributeSets.Add(Set);
+	}
+}
+
+void FMvAbilitySet_GrantedHandles::RemoveFromAbilitySystem(UMvAbilitySystemComponent* MvASC)
+{
+	check(MvASC);
+
+	for (const FGameplayAbilitySpecHandle& Handle : AbilitySpecHandles)
+	{
+		if (Handle.IsValid())
+		{
+			MvASC->ClearAbility(Handle);
+		}
+	}
+
+	for (const FActiveGameplayEffectHandle& Handle : GameplayEffectHandles)
+	{
+		if (Handle.IsValid())
+		{
+			MvASC->RemoveActiveGameplayEffect(Handle);
+		}
+	}
+
+	for (UAttributeSet* Set : AttributeSets)
+	{
+		MvASC->RemoveSpawnedAttribute(Set);
+	}
+
+	AbilitySpecHandles.Reset();
+	GameplayEffectHandles.Reset();
+	AttributeSets.Reset();
+}
 
 void UMvAbilitySet::GiveToAbilitySystem(
 	UMvAbilitySystemComponent* MvASC,
@@ -14,17 +74,8 @@ void UMvAbilitySet::GiveToAbilitySystem(
 {
 	check(MvASC);
 
-	int32 EntryIndex = 0;
-
 	for (const FMvAbilitySet_GameplayAbility& AbilityToGrant : GameplayAbilities)
 	{
-		if (!IsValid(AbilityToGrant.AbilityClass))
-		{
-			UE_LOG(LogMvAbilitySystem, Error, TEXT("Ability with index %d in ability set %s is not valid"),
-				EntryIndex, *GetNameSafe(this));
-			continue;
-		}
-
 		UMvGameplayAbility* AbilityCDO = AbilityToGrant.AbilityClass->GetDefaultObject<UMvGameplayAbility>();
 
 		FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToGrant.AbilityLevel);
@@ -35,7 +86,85 @@ void UMvAbilitySet::GiveToAbilitySystem(
 
 		if (OutGrantedHandles)
 		{
-			// TODO add spec to granted handles
+			OutGrantedHandles->AddAbilitySpecHandle(AbilitySpecHandle);
+		}
+	}
+
+	for (const FMvAbilitySet_GameplayEffect& EffectToGrant : GameplayEffects)
+	{
+		const UGameplayEffect* GameplayEffect = EffectToGrant.GameplayEffectClass->GetDefaultObject<UGameplayEffect>();
+		FActiveGameplayEffectHandle EffectHandle = MvASC->ApplyGameplayEffectToSelf(
+			GameplayEffect, EffectToGrant.EffectLevel, MvASC->MakeEffectContext());
+
+		if (OutGrantedHandles)
+		{
+			OutGrantedHandles->AddGameplayEffectHandle(EffectHandle);
+		}
+	}
+
+	for (const FMvAbilitySet_AttributeSet& SetToGrant : AttributeSets)
+	{
+		UAttributeSet* AttributeSet = NewObject<UAttributeSet>(MvASC->GetOwner(), SetToGrant.AttributeSetClass);
+
+		if (SetToGrant.InitData)
+		{
+			AttributeSet->InitFromMetaDataTable(SetToGrant.InitData);
+		}
+		else if (DefaultInitData)
+		{
+			AttributeSet->InitFromMetaDataTable(DefaultInitData);
+		}
+
+		MvASC->AddAttributeSetSubobject(AttributeSet);
+
+		if (OutGrantedHandles)
+		{
+			OutGrantedHandles->AddAttributeSet(AttributeSet);
 		}
 	}
 }
+
+#if WITH_EDITOR
+EDataValidationResult UMvAbilitySet::IsDataValid(FDataValidationContext& Context) const
+{
+	EDataValidationResult Result = CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid);
+
+	int32 EntryIndex = 0;
+	for (const FMvAbilitySet_GameplayAbility& Entry : GameplayAbilities)
+	{
+		if (!Entry.AbilityClass)
+		{
+			Result = EDataValidationResult::Invalid;
+			Context.AddError(FText::Format(LOCTEXT("GameplayAbilityClassIsNull", "Empty AbilityClass at index {0} in GameplayAbilities."), EntryIndex));
+		}
+	}
+
+	EntryIndex = 0;
+	for (const FMvAbilitySet_GameplayEffect& Entry : GameplayEffects)
+	{
+		if (!Entry.GameplayEffectClass)
+		{
+			Result = EDataValidationResult::Invalid;
+			Context.AddError(FText::Format(LOCTEXT("GameplayEffectClassIsNull", "Empty GameplayEffectClass at index {0} in GameplayEffects."), EntryIndex));
+		}
+	}
+
+	EntryIndex = 0;
+	for (const FMvAbilitySet_AttributeSet& Entry : AttributeSets)
+	{
+		if (!Entry.AttributeSetClass)
+		{
+			Result = EDataValidationResult::Invalid;
+			Context.AddError(FText::Format(LOCTEXT("GameplayEffectClassIsNull", "Empty AttributeSetClass at index {0} in AttributeSets."), EntryIndex));
+		}
+		if (!Entry.InitData && !DefaultInitData)
+		{
+			Context.AddWarning(FText::Format(LOCTEXT("InitDataIsNull", "Empty InitData at index {0} in AttributeSets and missing DefaultInitData. It's recommended to use DataTable to init Attribute Set."), EntryIndex));
+		}
+	}
+	
+	return Result;
+}
+#endif
+
+#undef LOCTEXT_NAMESPACE
