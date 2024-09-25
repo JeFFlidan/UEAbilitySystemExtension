@@ -62,5 +62,8 @@ protected:
 	TArray<FGameplayAbilitySpecHandle> InputReleasedSpecHandles;
 	TArray<FGameplayAbilitySpecHandle> InputHeldSpecHandles;
 
+	virtual void AbilitySpecInputPressed(FGameplayAbilitySpec& Spec) override;
+	virtual void AbilitySpecInputReleased(FGameplayAbilitySpec& Spec) override;
+
 	void ActivateCombatAbility(TSubclassOf<UMvGameplayAbility_Active_Combat> CombatAbilityClass);
 };

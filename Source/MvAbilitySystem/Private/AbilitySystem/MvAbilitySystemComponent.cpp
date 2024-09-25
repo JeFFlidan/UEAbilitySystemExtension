@@ -190,6 +190,28 @@ TArray<UGameplayAbility*> UMvAbilitySystemComponent::GetActiveAbilitiesByClass(
 	return ActiveAbilities;
 }
 
+void UMvAbilitySystemComponent::AbilitySpecInputPressed(FGameplayAbilitySpec& Spec)
+{
+	Super::AbilitySpecInputPressed(Spec);
+
+	if (Spec.IsActive())
+	{
+		InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec.Handle,
+			Spec.ActivationInfo.GetActivationPredictionKey());
+	}
+}
+
+void UMvAbilitySystemComponent::AbilitySpecInputReleased(FGameplayAbilitySpec& Spec)
+{
+	Super::AbilitySpecInputReleased(Spec);
+
+	if (Spec.IsActive())
+	{
+		InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, Spec.Handle,
+			Spec.ActivationInfo.GetActivationPredictionKey());
+	}
+}
+
 void UMvAbilitySystemComponent::ActivateCombatAbility(TSubclassOf<UMvGameplayAbility_Active_Combat> CombatAbilityClass)
 {
 	bShouldTriggerCombo = false;
