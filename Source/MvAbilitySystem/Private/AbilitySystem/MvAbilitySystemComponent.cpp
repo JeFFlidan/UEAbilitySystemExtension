@@ -10,12 +10,22 @@
 UMvAbilitySystemComponent::UMvAbilitySystemComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	ComboResetTime = 3.0f;
 }
 
 UMvGameplayAbility_Active_Combat* UMvAbilitySystemComponent::GetActiveCombatAbility() const
 {
 	TArray<UGameplayAbility*> Abilities = GetActiveAbilitiesByClass(UMvGameplayAbility_Active_Combat::StaticClass());
 	return Abilities.IsValidIndex(0) ? Cast<UMvGameplayAbility_Active_Combat>(Abilities[0]) : nullptr;
+}
+
+void UMvAbilitySystemComponent::OpenComboWindow()
+{
+	bWindowComboAttack = true;
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.ClearTimer(ComboResetTimerHandle);
+	TimerManager.SetTimer(ComboResetTimerHandle, this, &ThisClass::ResetCombo, ComboResetTime);
 }
 
 void UMvAbilitySystemComponent::CloseComboWindow()

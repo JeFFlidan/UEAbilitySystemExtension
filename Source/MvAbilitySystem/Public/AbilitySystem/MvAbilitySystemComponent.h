@@ -34,7 +34,7 @@ public:
 	virtual bool IsShouldTriggerCombo() const override { return bShouldTriggerCombo; }
 	virtual bool IsRequestTriggerCombo() const override { return bRequestTriggerCombo; }
 	virtual bool IsLastComboMontage() const override { return bIsLastComboMontage; }
-	virtual void OpenComboWindow() override { bWindowComboAttack = true; }
+	virtual void OpenComboWindow() override;
 	virtual void CloseComboWindow() override;
 
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);
@@ -46,6 +46,11 @@ public:
 	TArray<UGameplayAbility*> GetActiveAbilitiesByClass(TSubclassOf<UGameplayAbility> AbilityToSearchClass) const;
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "MVAS|Ability System")
+	float ComboResetTime;
+
+	FTimerHandle ComboResetTimerHandle;
+	
 	int32 ComboIndex;
 	bool bWindowComboAttack;
 	bool bRequestTriggerCombo;
