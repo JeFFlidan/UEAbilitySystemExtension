@@ -3,7 +3,7 @@
 #include "AbilitySystem/MvAbilitySet.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility.h"
-#include "AttributeSet.h"
+#include "AbilitySystem/Attributes/MvAttributeSet.h"
 
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
@@ -29,7 +29,7 @@ void FMvAbilitySet_GrantedHandles::AddGameplayEffectHandle(const FActiveGameplay
 	}
 }
 
-void FMvAbilitySet_GrantedHandles::AddAttributeSet(UAttributeSet* Set)
+void FMvAbilitySet_GrantedHandles::AddAttributeSet(UMvAttributeSet* Set)
 {
 	if (Set)
 	{
@@ -104,18 +104,26 @@ void UMvAbilitySet::GiveToAbilitySystem(
 
 	for (const FMvAbilitySet_AttributeSet& SetToGrant : AttributeSets)
 	{
-		UAttributeSet* AttributeSet = NewObject<UAttributeSet>(MvASC->GetOwner(), SetToGrant.AttributeSetClass);
-
-		if (SetToGrant.InitData)
+		UMvAttributeSet* AttributeSet = NewObject<UMvAttributeSet>(MvASC->GetOwner(), SetToGrant.AttributeSetClass);
+		
+		if (!bInitUsingCurveTables)
 		{
-			AttributeSet->InitFromMetaDataTable(SetToGrant.InitData);
-		}
-		else if (DefaultInitData)
-		{
-			AttributeSet->InitFromMetaDataTable(DefaultInitData);
+			if (SetToGrant.InitData)
+			{
+				AttributeSet->InitFromMetaDataTable(SetToGrant.InitData);
+			}
+			else if (DefaultInitData)
+			{
+				AttributeSet->InitFromMetaDataTable(DefaultInitData);
+			}
 		}
 
 		MvASC->AddAttributeSetSubobject(AttributeSet);
+
+		if (bInitUsingCurveTables)
+		{
+			AttributeSet->InitFromCurveTables(GroupName, Level);
+		}
 
 		if (OutGrantedHandles)
 		{
@@ -124,7 +132,22 @@ void UMvAbilitySet::GiveToAbilitySystem(
 	}
 }
 
+
 #if WITH_EDITOR
+void UMvAbilitySet::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FProperty* Property = PropertyChangedEvent.Property;
+	if (Property && Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMvAbilitySet, bInitUsingCurveTables))
+	{
+		for (FMvAbilitySet_AttributeSet& Entry : AttributeSets)
+		{
+			Entry.bInitUsingCurveTables = bInitUsingCurveTables;
+		}
+	}
+}
+
 EDataValidationResult UMvAbilitySet::IsDataValid(FDataValidationContext& Context) const
 {
 	EDataValidationResult Result = CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid);
@@ -157,9 +180,21 @@ EDataValidationResult UMvAbilitySet::IsDataValid(FDataValidationContext& Context
 			Result = EDataValidationResult::Invalid;
 			Context.AddError(FText::Format(LOCTEXT("GameplayEffectClassIsNull", "Empty AttributeSetClass at index {0} in AttributeSets."), EntryIndex));
 		}
-		if (!Entry.InitData && !DefaultInitData)
+
+		if (!bInitUsingCurveTables)
 		{
-			Context.AddWarning(FText::Format(LOCTEXT("InitDataIsNull", "Empty InitData at index {0} in AttributeSets and missing DefaultInitData. It's recommended to use DataTable to init Attribute Set."), EntryIndex));
+			if (!Entry.InitData && !DefaultInitData)
+			{
+				Context.AddWarning(FText::Format(LOCTEXT("InitDataIsNull", "Empty InitData at index {0} in AttributeSets and missing DefaultInitData. It's recommended to use DataTable to init Attribute Set."), EntryIndex));
+			}
+		}
+	}
+
+	if (bInitUsingCurveTables)
+	{
+		if (GroupName.IsNone())
+		{
+			Context.AddWarning(LOCTEXT("GroupNameIsNone", "Attribute Set Group Name is invalid. You must configure a valid Group Name to init Attribute Sets using Curve Tables."));
 		}
 	}
 	

@@ -38,4 +38,5 @@ class MVABILITYSYSTEM_API UMvAttributeSet : public UAttributeSet
 
 public:
 	UMvAbilitySystemComponent* GetMvAbilitySystemComponent() const;
+	void InitFromCurveTables(FName GroupName, int32 Level) const;
 };

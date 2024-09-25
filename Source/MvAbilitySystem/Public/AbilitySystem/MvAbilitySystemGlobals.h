@@ -9,9 +9,14 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(config=Game)
 class MVABILITYSYSTEM_API UMvAbilitySystemGlobals : public UAbilitySystemGlobals
 {
 	GENERATED_BODY()
-	
+
+public:
+	static UMvAbilitySystemGlobals& Get();
+	virtual void InitGlobalData() override;
+
+	inline static FName AttributeDefaultsOwnerName{"MvAbilitySystem"};
 };

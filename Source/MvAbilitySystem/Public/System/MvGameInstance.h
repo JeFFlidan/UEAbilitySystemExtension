@@ -17,4 +17,5 @@ class MVABILITYSYSTEM_API UMvGameInstance : public UGameInstance
 
 protected:
 	virtual void Init() override;
+	virtual void BeginDestroy() override;
 };

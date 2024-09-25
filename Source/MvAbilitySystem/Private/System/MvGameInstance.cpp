@@ -1,8 +1,9 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
 #include "System/MvGameInstance.h"
+#include "AbilitySystem/MvAbilitySystemGlobals.h"
+#include "AbilitySystem/MvAbilitySystemSettings.h"
 #include "MvGameplayTags.h"
-#include "MvLogChannels.h"
 
 #include "Components/GameFrameworkComponentManager.h"
 
@@ -11,7 +12,7 @@
 void UMvGameInstance::Init()
 {
 	Super::Init();
-	UE_LOG(LogMvAbilitySystem, Log, TEXT("Init custom game instance"))
+	
 	UGameFrameworkComponentManager* ComponentManager = GetSubsystem<UGameFrameworkComponentManager>(this);
 	if (ensure(ComponentManager))
 	{
@@ -20,4 +21,19 @@ void UMvGameInstance::Init()
 		ComponentManager->RegisterInitState(MvGameplayTags::InitState_DataInitialized, false, MvGameplayTags::InitState_DataAvailable);
 		ComponentManager->RegisterInitState(MvGameplayTags::InitState_GameplayReady, false, MvGameplayTags::InitState_DataInitialized);
 	}
+
+	const UMvAbilitySystemSettings* Settings = GetDefault<UMvAbilitySystemSettings>();
+	UMvAbilitySystemGlobals& Globals = UMvAbilitySystemGlobals::Get();
+	
+	Globals.AddAttributeDefaultTables(Globals.AttributeDefaultsOwnerName, Settings->GetSoftObjectPaths());
+}
+
+void UMvGameInstance::BeginDestroy()
+{
+	const UMvAbilitySystemSettings* Settings = GetDefault<UMvAbilitySystemSettings>();
+	UMvAbilitySystemGlobals& Globals = UMvAbilitySystemGlobals::Get();
+
+	Globals.RemoveAttributeDefaultTables(Globals.AttributeDefaultsOwnerName, Settings->GetSoftObjectPaths());
+	
+	Super::BeginDestroy();
 }

@@ -40,6 +40,7 @@ public class MvAbilitySystem : ModuleRules
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[] {
+				"DeveloperSettings"
 			}
 			);
 		

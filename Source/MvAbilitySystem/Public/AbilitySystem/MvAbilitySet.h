@@ -12,7 +12,7 @@
 class UObject;
 class UMvGameplayAbility;
 class UMvAbilitySystemComponent;
-class UAttributeSet;
+class UMvAttributeSet;
 class UGameplayEffect;
 class UDataTable;
 
@@ -49,10 +49,13 @@ struct FMvAbilitySet_AttributeSet
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UAttributeSet> AttributeSetClass;
+	TSubclassOf<UMvAttributeSet> AttributeSetClass;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "!bInitUsingCurveTables"))
 	TObjectPtr<UDataTable> InitData;
+
+	UPROPERTY(VisibleAnywhere)
+	bool bInitUsingCurveTables{false};
 };
 
 USTRUCT(BlueprintType)
@@ -62,7 +65,7 @@ struct FMvAbilitySet_GrantedHandles
 
 	void AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle);
 	void AddGameplayEffectHandle(const FActiveGameplayEffectHandle& Handle);
-	void AddAttributeSet(UAttributeSet* Set);
+	void AddAttributeSet(UMvAttributeSet* Set);
 
 	void RemoveFromAbilitySystem(UMvAbilitySystemComponent* MvASC);
 
@@ -74,7 +77,7 @@ protected:
 	TArray<FActiveGameplayEffectHandle> GameplayEffectHandles;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UAttributeSet>> AttributeSets;
+	TArray<TObjectPtr<UMvAttributeSet>> AttributeSets;
 };
 
 /**
@@ -89,6 +92,7 @@ public:
 	void GiveToAbilitySystem(UMvAbilitySystemComponent* MvASC, FMvAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
 
 #if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
 #endif
 	
@@ -102,6 +106,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets")
 	TArray<FMvAbilitySet_AttributeSet> AttributeSets;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets")
+	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets", meta = (EditCondition = "!bInitUsingCurveTables"))
 	TObjectPtr<UDataTable> DefaultInitData;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets")
+	bool bInitUsingCurveTables{false};
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets", meta = (EditCondition = "bInitUsingCurveTables"))
+	FName GroupName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attribute Sets", meta = (EditCondition = "bInitUsingCurveTables", ClampMin="1"))
+	int32 Level{1};
 };
