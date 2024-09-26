@@ -31,9 +31,12 @@ void UMvGameInstance::Init()
 void UMvGameInstance::BeginDestroy()
 {
 	const UMvAbilitySystemSettings* Settings = GetDefault<UMvAbilitySystemSettings>();
-	UMvAbilitySystemGlobals& Globals = UMvAbilitySystemGlobals::Get();
 
-	Globals.RemoveAttributeDefaultTables(Globals.AttributeDefaultsOwnerName, Settings->GetSoftObjectPaths());
+	if (UAbilitySystemGlobals::StaticClass()->GetDefaultObject<UAbilitySystemGlobals>()->AbilitySystemGlobalsClassName.TryLoadClass<UObject>())
+	{
+		UMvAbilitySystemGlobals& Globals = UMvAbilitySystemGlobals::Get();
+		Globals.RemoveAttributeDefaultTables(Globals.AttributeDefaultsOwnerName, Settings->GetSoftObjectPaths());
+	}
 	
 	Super::BeginDestroy();
 }
