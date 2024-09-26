@@ -50,15 +50,19 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 		
 		const FMvAbilityMontageInfo& MontageInfo = Montages[ComboIndex];
 
-		if (MontageInfo.Montage.IsValid())
-		{
-			CurrentAnimMontage = MontageInfo.Montage.Get();
-			PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
-		}
-		else
-		{
-			UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvGameplayAbility_Active_Combat::ActivateAbility(): Montage is not loaded."))
-		}
+		// TODO Understand why it does not work stable
+		// if (MontageInfo.Montage.IsValid())
+		// {
+		// 	CurrentAnimMontage = MontageInfo.Montage.Get();
+		// 	PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
+		// }
+		// else
+		// {
+		// 	UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvGameplayAbility_Active_Combat::ActivateAbility(): Montage is not loaded."))
+		// }
+
+		CurrentAnimMontage = MontageInfo.Montage.LoadSynchronous();
+		PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
 	}
 }
 
