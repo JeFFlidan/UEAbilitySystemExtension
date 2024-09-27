@@ -19,4 +19,7 @@ public:
 	virtual void InitGlobalData() override;
 
 	inline static FName AttributeDefaultsOwnerName{"MvAbilitySystem"};
+
+protected:
+	virtual void ReloadAttributeDefaults() override;
 };

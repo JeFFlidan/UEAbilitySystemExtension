@@ -2,14 +2,13 @@
 
 #include "AbilitySystem/AnimNotifies/AnimNotify_ComboWindowState.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
-#include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
 #include "Character/MvCharacter.h"
 #include "MvLogChannels.h"
 
 UAnimNotify_ComboWindowState::UAnimNotify_ComboWindowState(const FObjectInitializer& ObjInitializer)
 	:Super(ObjInitializer)
 {
-	bEndCombo = false;
+	
 }
 
 void UAnimNotify_ComboWindowState::NotifyBegin(
@@ -58,44 +57,5 @@ void UAnimNotify_ComboWindowState::NotifyEnd(
 			AbilitySystemComponent->ResetCombo();
 		}
 		AbilitySystemComponent->CloseComboWindow();
-	}
-}
-
-void UAnimNotify_ComboWindowState::NotifyTick(
-	USkeletalMeshComponent* MeshComp,
-	UAnimSequenceBase* Animation,
-	float FrameDeltaTime,
-	const FAnimNotifyEventReference& EventReference)
-{
-	if (!AbilitySystemComponent)
-	{
-		UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyTick(): ComboComponent is null."))
-		return;
-	}
-
-	if (AbilitySystemComponent->IsOpenComboWindow() && AbilitySystemComponent->IsShouldTriggerCombo()
-		&& AbilitySystemComponent->IsRequestTriggerCombo() && !AbilitySystemComponent->IsLastComboMontage())
-	{
-		if (AbilitySystemComponent->IsActiveNextCombo())
-		{
-			return;
-		}
-		
-		const UMvGameplayAbility_Active_Combat* Ability = AbilitySystemComponent->GetActiveCombatAbility();
-		if (!Ability)
-		{
-			UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyTick(): Ability is null."))
-			return;
-		}
-		
-		if (AbilitySystemComponent->TryActivateAbilityByClass(Ability->GetClass()))
-		{
-			AbilitySystemComponent->ActivateNextCombo();
-		}
-		else
-		{
-			UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyTick(): Failed to activate Ability [%s]"),
-				*GetNameSafe(Ability));
-		}
 	}
 }

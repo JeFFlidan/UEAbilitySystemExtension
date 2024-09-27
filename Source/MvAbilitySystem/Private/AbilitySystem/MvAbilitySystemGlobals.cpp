@@ -14,3 +14,11 @@ void UMvAbilitySystemGlobals::InitGlobalData()
 {
 	Super::InitGlobalData();
 }
+
+void UMvAbilitySystemGlobals::ReloadAttributeDefaults()
+{
+	if (!GlobalAttributeDefaultsTables.IsEmpty())
+	{
+		Super::ReloadAttributeDefaults();
+	}
+}
