@@ -24,6 +24,8 @@ public:
 
 	virtual void OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData) override;
 
+	void ResetCombo() { ComboIndex = 0; }
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Combat")
 	TArray<FMvAbilityMontageInfo> Montages;
@@ -39,6 +41,8 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAnimMontage> CurrentAnimMontage;
+
+	int32 ComboIndex;
 
 	void ResetMontage() const;
 };

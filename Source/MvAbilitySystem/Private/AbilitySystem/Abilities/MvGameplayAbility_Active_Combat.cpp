@@ -9,7 +9,8 @@
 UMvGameplayAbility_Active_Combat::UMvGameplayAbility_Active_Combat(const FObjectInitializer& ObjectInitializer)
 	:  Super(ObjectInitializer)
 {
-	
+	ComboIndex = 0;
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 void UMvGameplayAbility_Active_Combat::ActivateAbility(
@@ -25,45 +26,27 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 		EndAbility(Handle, ActorInfo, ActivationInfo, false, true);
 		return;
 	}
-
-	if (UMvAbilitySystemComponent* AbilitySystemComponent = GetMvAbilitySystemComponentFromActorInfo())
+	
+	if (ComboIndex >= Montages.Num())
 	{
-		int32 ComboIndex = AbilitySystemComponent->GetComboIndex();
-		AbilitySystemComponent->IncrementComboIndex();
-		
-		if (ComboIndex >= Montages.Num())
-		{
-			AbilitySystemComponent->ResetCombo();
-			ComboIndex = AbilitySystemComponent->GetComboIndex();
-		}
-		else
-		{
-			if (ComboIndex == Montages.Num() - 1)
-			{
-				AbilitySystemComponent->SetIsLastComboMontage(true);
-			}
-			else
-			{
-				AbilitySystemComponent->SetIsLastComboMontage(false);
-			}
-		}
-		
-		const FMvAbilityMontageInfo& MontageInfo = Montages[ComboIndex];
-
-		// TODO Understand why it does not work stable
-		// if (MontageInfo.Montage.IsValid())
-		// {
-		// 	CurrentAnimMontage = MontageInfo.Montage.Get();
-		// 	PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
-		// }
-		// else
-		// {
-		// 	UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvGameplayAbility_Active_Combat::ActivateAbility(): Montage is not loaded."))
-		// }
-
-		CurrentAnimMontage = MontageInfo.Montage.LoadSynchronous();
-		PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
+		ResetCombo();
 	}
+		
+	const FMvAbilityMontageInfo& MontageInfo = Montages[ComboIndex++];
+
+	// TODO Understand why it does not work stable
+	// if (MontageInfo.Montage.IsValid())
+	// {
+	// 	CurrentAnimMontage = MontageInfo.Montage.Get();
+	// 	PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvGameplayAbility_Active_Combat::ActivateAbility(): Montage is not loaded."))
+	// }
+
+	CurrentAnimMontage = MontageInfo.Montage.LoadSynchronous();
+	PlayMontageWaitEvent(CurrentAnimMontage, MontageInfo.Speed);
 }
 
 void UMvGameplayAbility_Active_Combat::OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData)

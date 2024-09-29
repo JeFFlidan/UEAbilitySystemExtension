@@ -13,29 +13,6 @@ UMvAbilitySystemComponent::UMvAbilitySystemComponent(const FObjectInitializer& O
 	ComboResetTime = 3.0f;
 }
 
-UMvGameplayAbility_Active_Combat* UMvAbilitySystemComponent::GetActiveCombatAbility() const
-{
-	TArray<UGameplayAbility*> Abilities = GetActiveAbilitiesByClass(UMvGameplayAbility_Active_Combat::StaticClass());
-	return Abilities.IsValidIndex(0) ? Cast<UMvGameplayAbility_Active_Combat>(Abilities[0]) : nullptr;
-}
-
-void UMvAbilitySystemComponent::OpenComboWindow()
-{
-	bWindowComboAttack = true;
-
-	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.ClearTimer(ComboResetTimerHandle);
-	TimerManager.SetTimer(ComboResetTimerHandle, this, &ThisClass::ResetCombo, ComboResetTime);
-}
-
-void UMvAbilitySystemComponent::CloseComboWindow()
-{
-	bWindowComboAttack = false;
-	bRequestTriggerCombo = false;
-	bNextComboAbilityActivated = false;
-	bShouldTriggerCombo = false;
-}
-
 void UMvAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
 {
 	if (InputTag.IsValid())
@@ -69,7 +46,7 @@ void UMvAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inpu
 void UMvAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGamePaused)
 {
 	static TArray<FGameplayAbilitySpecHandle> NonCombatAbilitiesToActivate;
-	static TArray<TSubclassOf<UMvGameplayAbility_Active_Combat>> CombatAbilitiesToActivate;
+	static TArray<FGameplayAbilitySpec*> CombatAbilitiesToActivate;
 	NonCombatAbilitiesToActivate.Reset();
 	CombatAbilitiesToActivate.Reset();
 
@@ -104,9 +81,9 @@ void UMvAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGameP
 
 					if (Ability && Ability->GetActivationPolicy() == EMvAbilityActivationPolicy::OnInputTriggered)
 					{
-						if (const UMvGameplayAbility_Active_Combat* CombatAbility = Cast<UMvGameplayAbility_Active_Combat>(Ability))
+						if (Cast<UMvGameplayAbility_Active_Combat>(Ability))
 						{
-							CombatAbilitiesToActivate.Add(CombatAbility->GetClass());
+							CombatAbilitiesToActivate.Add(AbilitySpec);
 						}
 						else
 						{
@@ -123,9 +100,9 @@ void UMvAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGameP
 		TryActivateAbility(SpecHandle);
 	}
 
-	for (TSubclassOf<UMvGameplayAbility_Active_Combat> CombatAbilityClass : CombatAbilitiesToActivate)
+	for (FGameplayAbilitySpec* CombatAbilitySpec : CombatAbilitiesToActivate)
 	{
-		ActivateCombatAbility(CombatAbilityClass);
+		ActivateCombatAbility(CombatAbilitySpec);
 	}
 
 	for (const FGameplayAbilitySpecHandle& SpecHandle : InputReleasedSpecHandles)
@@ -212,16 +189,30 @@ void UMvAbilitySystemComponent::AbilitySpecInputReleased(FGameplayAbilitySpec& S
 	}
 }
 
-void UMvAbilitySystemComponent::ActivateCombatAbility(TSubclassOf<UMvGameplayAbility_Active_Combat> CombatAbilityClass)
+void UMvAbilitySystemComponent::ActivateCombatAbility(FGameplayAbilitySpec* CombatAbilitySpec)
 {
-	bShouldTriggerCombo = false;
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	
+	if (LastActivatedCombatAbilitySpec != CombatAbilitySpec)
+	{
+		if (LastActivatedCombatAbilitySpec)
+		{
+			GetCombatAbilityFromSpec(LastActivatedCombatAbilitySpec)->ResetCombo();
+		}
+		
+		LastActivatedCombatAbilitySpec = CombatAbilitySpec;
+		TimerManager.ClearTimer(ComboResetTimerHandle);
+		TimerManager.SetTimer(ComboResetTimerHandle, FTimerDelegate::CreateLambda([this]
+		{
+			GetCombatAbilityFromSpec(this->LastActivatedCombatAbilitySpec)->ResetCombo();
+			this->LastActivatedCombatAbilitySpec = nullptr;
+		}), ComboResetTime, false);
+	}
 
-	if (IsUsingAbilityByClass(CombatAbilityClass))
-	{
-		bShouldTriggerCombo = bWindowComboAttack;
-	}
-	else
-	{
-		TryActivateAbilityByClass(CombatAbilityClass);
-	}
+	TryActivateAbility(CombatAbilitySpec->Handle);
+}
+
+UMvGameplayAbility_Active_Combat* UMvAbilitySystemComponent::GetCombatAbilityFromSpec(FGameplayAbilitySpec* Spec) const
+{
+	return CastChecked<UMvGameplayAbility_Active_Combat>(Spec->GetPrimaryInstance());
 }

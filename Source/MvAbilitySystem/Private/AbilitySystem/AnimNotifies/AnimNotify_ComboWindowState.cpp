@@ -18,28 +18,28 @@ void UAnimNotify_ComboWindowState::NotifyBegin(
 	const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
-
-	if (!MeshComp)
-	{
-		UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyBegin(): MeshComp is invalid."))
-		return;
-	}
-
-	if (!MeshComp->GetOwner())
-	{
-		UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyBegin(): MeshComp owner is invalid."))
-		return;
-	}
-	
-	if (AMvCharacter* Character = Cast<AMvCharacter>(MeshComp->GetOwner()))
-	{
-		AbilitySystemComponent = Character->GetMvAbilitySystemComponent();
-	}
-
-	if (AbilitySystemComponent)
-	{
-		AbilitySystemComponent->OpenComboWindow();
-	}
+	//
+	// if (!MeshComp)
+	// {
+	// 	UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyBegin(): MeshComp is invalid."))
+	// 	return;
+	// }
+	//
+	// if (!MeshComp->GetOwner())
+	// {
+	// 	UE_LOG(LogMvAbilitySystem, Error, TEXT("UAnimNotify_ComboWindowState::NotifyBegin(): MeshComp owner is invalid."))
+	// 	return;
+	// }
+	//
+	// if (AMvCharacter* Character = Cast<AMvCharacter>(MeshComp->GetOwner()))
+	// {
+	// 	AbilitySystemComponent = Character->GetMvAbilitySystemComponent();
+	// }
+	//
+	// if (AbilitySystemComponent)
+	// {
+	// 	AbilitySystemComponent->OpenComboWindow();
+	// }
 }
 
 void UAnimNotify_ComboWindowState::NotifyEnd(
@@ -48,14 +48,14 @@ void UAnimNotify_ComboWindowState::NotifyEnd(
 	const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
-
-	if (AbilitySystemComponent)
-	{
-		if (!AbilitySystemComponent->IsActiveNextCombo() && AbilitySystemComponent->IsLastComboMontage())
-		{
-			UE_LOG(LogMvAbilitySystem, Display, TEXT("UAnimNotify_ComboWindowState::NotifyEnd(): Reset combo."))
-			AbilitySystemComponent->ResetCombo();
-		}
-		AbilitySystemComponent->CloseComboWindow();
-	}
+	//
+	// if (AbilitySystemComponent)
+	// {
+	// 	if (!AbilitySystemComponent->IsActiveNextCombo() && AbilitySystemComponent->IsLastComboMontage())
+	// 	{
+	// 		UE_LOG(LogMvAbilitySystem, Display, TEXT("UAnimNotify_ComboWindowState::NotifyEnd(): Reset combo."))
+	// 		AbilitySystemComponent->ResetCombo();
+	// 	}
+	// 	AbilitySystemComponent->CloseComboWindow();
+	// }
 }
