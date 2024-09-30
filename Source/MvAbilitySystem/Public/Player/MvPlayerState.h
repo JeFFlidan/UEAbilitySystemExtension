@@ -38,7 +38,7 @@ public:
 	void CallOrRegister_OnPawnDataLoaded(FOnPawnDataLoaded::FDelegate&& Delegate);
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "MVAS|PlayerState")
+	UPROPERTY(BlueprintReadWrite, Category = "MVAS|PlayerState")
 	TObjectPtr<UMvAbilitySystemComponent> AbilitySystemComponent;
 	
 	TObjectPtr<const UMvPawnData> PawnData;

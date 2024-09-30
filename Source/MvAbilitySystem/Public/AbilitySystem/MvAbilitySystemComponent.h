@@ -25,8 +25,18 @@ public:
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	void ClearAbilityInput();
 
+	bool IsAbilityGranted(TSubclassOf<UGameplayAbility> AbilityClass) const;
 	bool IsUsingAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass) const;
-	TArray<UGameplayAbility*> GetActiveAbilitiesByClass(TSubclassOf<UGameplayAbility> AbilityToSearchClass) const;
+	TArray<UGameplayAbility*> GetActiveAbilitiesByClass(TSubclassOf<UGameplayAbility> AbilityClassToSearch) const;
+
+	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability System|Input")
+	void AddInputTagToAbility(TSubclassOf<UGameplayAbility> AbilityClass, const FGameplayTag& InputTag);
+
+	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability System|Input")
+	void RemoveInputTagFromAbility(TSubclassOf<UGameplayAbility> AbilityClass, const FGameplayTag& InputTag);
+
+	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability System")
+	void DeactivatePassiveAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "MVAS|Ability System")
@@ -35,13 +45,6 @@ protected:
 	FGameplayAbilitySpec* LastActivatedCombatAbilitySpec;
 
 	FTimerHandle ComboResetTimerHandle;
-	
-	int32 ComboIndex;
-	bool bWindowComboAttack;
-	bool bRequestTriggerCombo;
-	bool bNextComboAbilityActivated;
-	bool bShouldTriggerCombo;
-	bool bIsLastComboMontage;
 
 	TArray<FGameplayAbilitySpecHandle> InputPressedSpecHandles;
 	TArray<FGameplayAbilitySpecHandle> InputReleasedSpecHandles;

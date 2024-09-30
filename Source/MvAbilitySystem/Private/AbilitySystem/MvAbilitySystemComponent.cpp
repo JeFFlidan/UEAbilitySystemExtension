@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/MvAbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active.h"
+#include "AbilitySystem/Abilities/MvGameplayAbility_Passive.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
 #include "MvLogChannels.h"
 
@@ -132,6 +133,21 @@ void UMvAbilitySystemComponent::ClearAbilityInput()
 	InputHeldSpecHandles.Empty();
 }
 
+bool UMvAbilitySystemComponent::IsAbilityGranted(TSubclassOf<UGameplayAbility> AbilityClass) const
+{
+	const TArray<FGameplayAbilitySpec>& Specs = GetActivatableAbilities();
+
+	for (const FGameplayAbilitySpec& Spec : Specs)
+	{
+		if (Spec.Ability && Spec.Ability.GetClass()->IsChildOf(AbilityClass))
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 bool UMvAbilitySystemComponent::IsUsingAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass) const
 {
 	if (!AbilityClass)
@@ -144,14 +160,14 @@ bool UMvAbilitySystemComponent::IsUsingAbilityByClass(TSubclassOf<UGameplayAbili
 }
 
 TArray<UGameplayAbility*> UMvAbilitySystemComponent::GetActiveAbilitiesByClass(
-	TSubclassOf<UGameplayAbility> AbilityToSearchClass) const
+	TSubclassOf<UGameplayAbility> AbilityClassToSearch) const
 {
 	const TArray<FGameplayAbilitySpec>& Specs = GetActivatableAbilities();
 	TArray<UGameplayAbility*> ActiveAbilities;
 
 	for (const FGameplayAbilitySpec& Spec : Specs)
 	{
-		if (Spec.Ability && Spec.Ability.GetClass()->IsChildOf(AbilityToSearchClass))
+		if (Spec.Ability && Spec.Ability.GetClass()->IsChildOf(AbilityClassToSearch))
 		{
 			TArray<UGameplayAbility*> AbilityInstances = Spec.GetAbilityInstances();
 			for (UGameplayAbility* AbilityInstance : AbilityInstances)
@@ -165,6 +181,67 @@ TArray<UGameplayAbility*> UMvAbilitySystemComponent::GetActiveAbilitiesByClass(
 	}
 
 	return ActiveAbilities;
+}
+
+void UMvAbilitySystemComponent::AddInputTagToAbility(TSubclassOf<UGameplayAbility> AbilityClass, const FGameplayTag& InputTag)
+{
+	if (!AbilityClass->IsChildOf(UMvGameplayAbility_Active::StaticClass()))
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvAbilitySystemComponent::AddInputTagToAbility(): Can't add InputTag to passive ability [%s]."),
+			*GetNameSafe(AbilityClass));
+		return;
+	}
+
+	if (FGameplayAbilitySpec* Spec = FindAbilitySpecFromClass(AbilityClass))
+	{
+		Spec->DynamicAbilityTags.AddTag(InputTag);
+	}
+	else
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvAbilitySystemComponent::AddInputTagToAbility(): Ability [%s] is not granted."),
+			*GetNameSafe(AbilityClass));
+	}
+}
+
+void UMvAbilitySystemComponent::RemoveInputTagFromAbility(TSubclassOf<UGameplayAbility> AbilityClass, const FGameplayTag& InputTag)
+{
+	if (!AbilityClass->IsChildOf(UMvGameplayAbility_Active::StaticClass()))
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvAbilitySystemComponent::RemoveInputTagFromAbility(): Can't remove InputTag from passive ability [%s]."),
+			*GetNameSafe(AbilityClass));
+		return;
+	}
+
+	if (FGameplayAbilitySpec* Spec = FindAbilitySpecFromClass(AbilityClass))
+	{
+		Spec->DynamicAbilityTags.RemoveTag(InputTag);
+	}
+	else
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvAbilitySystemComponent::AddInputTagToAbility(): Ability [%s] is not granted."),
+			*GetNameSafe(AbilityClass));
+	}
+}
+
+void UMvAbilitySystemComponent::DeactivatePassiveAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass)
+{
+	if (!AbilityClass->IsChildOf(UMvGameplayAbility_Passive::StaticClass()))
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvAbilitySystemComponent::DeactivatePassiveAbilityByClass(): Can't deactivate active ability [%s]."),
+					*GetNameSafe(AbilityClass));
+		return;
+	}
+
+	if (FGameplayAbilitySpec* Spec = FindAbilitySpecFromClass(AbilityClass))
+	{
+		UMvGameplayAbility_Passive* PassiveAbility = CastChecked<UMvGameplayAbility_Passive>(Spec->GetPrimaryInstance());
+		PassiveAbility->RemoveAllActiveGameplayEffects();
+	}
+	else
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvAbilitySystemComponent::DeactivatePassiveAbilityByClass(): Ability [%s] is not granted."),
+			*GetNameSafe(AbilityClass));
+	}
 }
 
 void UMvAbilitySystemComponent::AbilitySpecInputPressed(FGameplayAbilitySpec& Spec)

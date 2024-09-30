@@ -2,7 +2,6 @@
 
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
-#include "MvLogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvGameplayAbility_Active_Combat)
 
@@ -19,13 +18,13 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, false, true);
 		return;
 	}
+	
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
 	if (ComboIndex >= Montages.Num())
 	{
