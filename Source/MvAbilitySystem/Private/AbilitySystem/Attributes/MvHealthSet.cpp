@@ -15,6 +15,8 @@ UMvHealthSet::UMvHealthSet()
 
 void UMvHealthSet::InitDelegates()
 {
+	Super::InitDelegates();
+	
 	if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
 	{
 		ASC->GetGameplayAttributeValueChangeDelegate(GetHealthAttribute()).AddUObject(this, &ThisClass::HealthCallback);

@@ -5,6 +5,7 @@
 #include "AbilitySystem/Abilities/MvGameplayAbility_Passive.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
 #include "MvLogChannels.h"
+#include "AbilitySystem/Attributes/MvAttributeSet.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvAbilitySystemComponent)
 
@@ -131,6 +132,13 @@ void UMvAbilitySystemComponent::ClearAbilityInput()
 	InputPressedSpecHandles.Empty();
 	InputReleasedSpecHandles.Empty();
 	InputHeldSpecHandles.Empty();
+}
+
+void UMvAbilitySystemComponent::AddMvAttributeSet(UMvAttributeSet* AttributeSet)
+{
+	check(AttributeSet);
+	AddAttributeSetSubobject(AttributeSet);
+	AttributeSet->InitDelegates();
 }
 
 bool UMvAbilitySystemComponent::IsAbilityGranted(TSubclassOf<UGameplayAbility> AbilityClass) const

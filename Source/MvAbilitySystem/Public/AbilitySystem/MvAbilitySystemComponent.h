@@ -7,6 +7,7 @@
 #include "MvAbilitySystemComponent.generated.h"
 
 class UObject;
+class UMvAttributeSet;
 class UMvGameplayAbility_Active_Combat;
 
 /**
@@ -24,6 +25,8 @@ public:
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	void ClearAbilityInput();
+
+	virtual void AddMvAttributeSet(UMvAttributeSet* AttributeSet);
 
 	bool IsAbilityGranted(TSubclassOf<UGameplayAbility> AbilityClass) const;
 	bool IsUsingAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass) const;
