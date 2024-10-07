@@ -8,6 +8,7 @@
 class UObject;
 class UMvAbilitySystemComponent;
 struct FGameplayEffectSpec;
+struct FOnAttributeChangeData;
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName)			\
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName)  \
@@ -39,4 +40,12 @@ class MVABILITYSYSTEM_API UMvAttributeSet : public UAttributeSet
 public:
 	UMvAbilitySystemComponent* GetMvAbilitySystemComponent() const;
 	void InitFromCurveTables(FName GroupName, int32 Level) const;
+	virtual void InitDelegates() { }
+
+protected:
+	void AdjustAttributeForMaxChange(
+		const FGameplayAttributeData& AffectedAttribute,
+		const FGameplayAttributeData& MaxAttribute,
+		float NewMaxValue,
+		const FGameplayAttribute& AffectedAttributeProperty) const;
 };

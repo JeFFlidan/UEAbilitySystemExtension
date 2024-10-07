@@ -105,6 +105,7 @@ void UMvAbilitySet::GiveToAbilitySystem(
 	for (const FMvAbilitySet_AttributeSet& SetToGrant : AttributeSets)
 	{
 		UMvAttributeSet* AttributeSet = NewObject<UMvAttributeSet>(MvASC->GetOwner(), SetToGrant.AttributeSetClass);
+		AttributeSet->InitDelegates();
 		
 		if (!bInitUsingCurveTables)
 		{
