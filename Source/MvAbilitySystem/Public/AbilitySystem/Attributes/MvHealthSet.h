@@ -15,9 +15,9 @@ class MVABILITYSYSTEM_API UMvHealthSet : public UMvAttributeSet
 	GENERATED_BODY()
 
 public:
-	FMvAttributeEvent OnHealthChanged;
-	FMvAttributeEvent OnMaxHealthChanged;
-	FMvAttributeEvent OnOutOfHealth;
+	mutable FMvAttributeEvent OnHealthChanged;
+	mutable FMvAttributeEvent OnMaxHealthChanged;
+	mutable FMvAttributeEvent OnOutOfHealth;
 	
 	UMvHealthSet();
 	

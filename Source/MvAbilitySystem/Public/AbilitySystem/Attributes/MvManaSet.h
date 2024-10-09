@@ -15,9 +15,9 @@ class MVABILITYSYSTEM_API UMvManaSet : public UMvAttributeSet
 	GENERATED_BODY()
 
 public:
-	FMvAttributeEvent OnManaChanged;
-	FMvAttributeEvent OnMaxManaChanged;
-	FMvAttributeEvent OnOutOfMana;
+	mutable FMvAttributeEvent OnManaChanged;
+	mutable FMvAttributeEvent OnMaxManaChanged;
+	mutable FMvAttributeEvent OnOutOfMana;
 	
 	UMvManaSet();
 
