@@ -26,8 +26,6 @@ public:
 	void ProcessAbilityInput(float DeltaTime, bool bGamePaused);
 	void ClearAbilityInput();
 
-	virtual void AddMvAttributeSet(UMvAttributeSet* AttributeSet);
-
 	bool IsAbilityGranted(TSubclassOf<UGameplayAbility> AbilityClass) const;
 	bool IsUsingAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass) const;
 	TArray<UGameplayAbility*> GetActiveAbilitiesByClass(TSubclassOf<UGameplayAbility> AbilityClassToSearch) const;

@@ -24,8 +24,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UMvHealthSet, Health);
 	ATTRIBUTE_ACCESSORS(UMvHealthSet, MaxHealth);
 
-	virtual void InitDelegates() override;
-
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "MVAS|Health", meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData Health;
@@ -37,10 +35,9 @@ protected:
 	
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 	virtual bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
-
-	void HealthCallback(const FOnAttributeChangeData& Data);
-	void MaxHealthCallback(const FOnAttributeChangeData& Data);
+	
 	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
 };
