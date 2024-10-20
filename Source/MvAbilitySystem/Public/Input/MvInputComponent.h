@@ -56,10 +56,11 @@ void UMvInputComponent::BindBasicAction(const UMvInputConfig* InputConfig, const
 	check(InputConfig);
 	if (const UInputAction* InputAction = InputConfig->GetBasicInputActionByTag(InputTag))
 	{
-		return FMvInputBindHandles(BindBindAction(InputAction, TriggerEvent, Object, Func).GetHandle());
+		if (Func)
+		{
+			BindAction(InputAction, ETriggerEvent::Started, Object, Func, InputTag);
+		}
 	}
-
-	return FMvInputBindHandles();
 }
 
 template<class UserClass, typename PressedFuncType, typename ReleasedFuncType>
@@ -73,7 +74,7 @@ void UMvInputComponent::BindConstantAbilityActions(const UMvInputConfig* InputCo
 		{
 			if (PressedFunc)
 			{
-				BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, PressedFunc, Action.InputTag).GetHandle();
+				BindAction(Action.InputAction, ETriggerEvent::Started, Object, PressedFunc, Action.InputTag).GetHandle();
 			}
 
 			if (ReleasedFunc)
@@ -94,7 +95,7 @@ FMvInputBindHandles UMvInputComponent::BindCustomizableAbilityAction(const UMvIn
 	{
 		if (PressedFunc)
 		{
-			PressedHandle = BindAction(InputAction, ETriggerEvent::Triggered, Object, PressedFunc, AbilityTag).GetHandle();
+			PressedHandle = BindAction(InputAction, ETriggerEvent::Started, Object, PressedFunc, AbilityTag).GetHandle();
 		}
 
 		if (ReleasedFunc)

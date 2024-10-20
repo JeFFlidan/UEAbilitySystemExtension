@@ -1,11 +1,14 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
 #include "AbilitySystem/MvAbilitySystemComponent.h"
+#include "AbilitySystem/Attributes/MvAttributeSet.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Passive.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
+#include "Player/MvPlayerState.h"
 #include "MvLogChannels.h"
-#include "AbilitySystem/Attributes/MvAttributeSet.h"
+
+#include "Kismet/GameplayStatics.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvAbilitySystemComponent)
 
@@ -13,6 +16,18 @@ UMvAbilitySystemComponent::UMvAbilitySystemComponent(const FObjectInitializer& O
 	: Super(ObjectInitializer)
 {
 	ComboResetTime = 3.0f;
+}
+
+UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindPlayerMvAbilitySystemComponent(const UObject* WorldContextObject)
+{
+	AMvPlayerState* PlayerState = CastChecked<AMvPlayerState>(UGameplayStatics::GetPlayerState(WorldContextObject, 0));
+
+	return PlayerState->GetMvAbilitySystemComponent();
+}
+
+UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindMvAbilitySystemComponent(AActor* Actor)
+{
+	return Actor ? Actor->FindComponentByClass<UMvAbilitySystemComponent>() : nullptr;
 }
 
 void UMvAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)

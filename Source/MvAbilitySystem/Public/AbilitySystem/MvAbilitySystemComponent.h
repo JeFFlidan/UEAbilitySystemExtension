@@ -20,6 +20,12 @@ class MVABILITYSYSTEM_API UMvAbilitySystemComponent : public UAbilitySystemCompo
 	
 public:
 	UMvAbilitySystemComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
+	UFUNCTION(BlueprintPure, Category = "MVAS|Ability System", meta = (WorldContext = "WorldContextObject"))
+	static UMvAbilitySystemComponent* FindPlayerMvAbilitySystemComponent(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "MVAS|Ability System")
+	static UMvAbilitySystemComponent* FindMvAbilitySystemComponent(AActor* Actor);
 
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
