@@ -12,31 +12,11 @@ UMvManaSet::UMvManaSet()
 {
 }
 
-void UMvManaSet::InitDelegates()
-{
-	Super::InitDelegates();
-
-	if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
-	{
-		ASC->GetGameplayAttributeValueChangeDelegate(GetManaAttribute()).AddUObject(this, &ThisClass::ManaCallaback);
-		ASC->GetGameplayAttributeValueChangeDelegate(GetMaxManaAttribute()).AddUObject(this, &ThisClass::MaxManaCallback);
-	}
-	else
-	{
-		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvManaSet::InitDelegates(): Failed to bind delegates."))
-	}
-}
-
 void UMvManaSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute,NewValue);
 
 	ClampAttribute(Attribute, NewValue);
-
-	if (Attribute == GetMaxManaAttribute())
-	{
-		AdjustAttributeForMaxChange(Mana, MaxMana, NewValue, GetManaAttribute());
-	}
 }
 
 void UMvManaSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
@@ -44,10 +24,20 @@ void UMvManaSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, flo
 	Super::PreAttributeBaseChange(Attribute,NewValue);
 
 	ClampAttribute(Attribute, NewValue);
+}
+
+void UMvManaSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
 	if (Attribute == GetMaxManaAttribute())
 	{
-		AdjustAttributeForMaxChange(Mana, MaxMana, NewValue, GetManaAttribute());
+		AdjustAttributeForMaxChange(Mana, MaxMana, OldValue, NewValue, GetManaAttribute());
+		OnMaxManaChanged.Broadcast(nullptr, nullptr, nullptr, NewValue - OldValue, OldValue, NewValue);
+	}
+	else if (Attribute == GetManaAttribute())
+	{
+		OnManaChanged.Broadcast(nullptr, nullptr, nullptr, NewValue - OldValue, OldValue, NewValue);
 	}
 }
 
@@ -59,16 +49,6 @@ void UMvManaSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData&
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.0f, GetMaxMana()));
 	}
-}
-
-void UMvManaSet::ManaCallaback(const FOnAttributeChangeData& Data)
-{
-	OnManaChanged.Broadcast(nullptr, nullptr, nullptr, Data.NewValue - Data.OldValue, Data.OldValue, Data.NewValue);
-}
-
-void UMvManaSet::MaxManaCallback(const FOnAttributeChangeData& Data)
-{
-	OnMaxManaChanged.Broadcast(nullptr, nullptr, nullptr, Data.NewValue - Data.OldValue, Data.OldValue, Data.NewValue);
 }
 
 void UMvManaSet::ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const

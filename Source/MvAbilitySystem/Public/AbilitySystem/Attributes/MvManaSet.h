@@ -24,8 +24,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UMvManaSet, Mana);
 	ATTRIBUTE_ACCESSORS(UMvManaSet, MaxMana);
 
-	virtual void InitDelegates() override;
-
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "MVAS|Mana", meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData Mana;
@@ -37,9 +35,8 @@ protected:
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
-
-	void ManaCallaback(const FOnAttributeChangeData& Data);
-	void MaxManaCallback(const FOnAttributeChangeData& Data);
+	
 	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
 };

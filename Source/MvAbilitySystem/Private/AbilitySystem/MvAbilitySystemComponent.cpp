@@ -149,13 +149,6 @@ void UMvAbilitySystemComponent::ClearAbilityInput()
 	InputHeldSpecHandles.Empty();
 }
 
-void UMvAbilitySystemComponent::AddMvAttributeSet(UMvAttributeSet* AttributeSet)
-{
-	check(AttributeSet);
-	AddAttributeSetSubobject(AttributeSet);
-	AttributeSet->InitDelegates();
-}
-
 bool UMvAbilitySystemComponent::IsAbilityGranted(TSubclassOf<UGameplayAbility> AbilityClass) const
 {
 	const TArray<FGameplayAbilitySpec>& Specs = GetActivatableAbilities();

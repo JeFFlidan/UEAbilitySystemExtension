@@ -21,16 +21,16 @@ void UMvAttributeSet::InitFromCurveTables(FName GroupName, int32 Level) const
 void UMvAttributeSet::AdjustAttributeForMaxChange(
 	const FGameplayAttributeData& AffectedAttribute,
 	const FGameplayAttributeData& MaxAttribute,
+	float OldMaxValue,
 	float NewMaxValue,
 	const FGameplayAttribute& AffectedAttributeProperty) const
 {
 	UAbilitySystemComponent* AbilityComponent = GetOwningAbilitySystemComponent();
-	const float CurrentMaxValue = MaxAttribute.GetCurrentValue();
 
-	if (!FMath::IsNearlyEqual(CurrentMaxValue, NewMaxValue) && AbilityComponent)
+	if (!FMath::IsNearlyEqual(OldMaxValue, NewMaxValue) && AbilityComponent)
 	{
 		const float CurrentValue = AffectedAttribute.GetCurrentValue();
-		float NewDelta = (CurrentMaxValue > 0.0f) ? (CurrentValue * NewMaxValue / CurrentMaxValue) - CurrentValue : NewMaxValue;
+		float NewDelta = OldMaxValue > 0.0f ? (CurrentValue * NewMaxValue / OldMaxValue) - CurrentValue : NewMaxValue;
 		
 		AbilityComponent->ApplyModToAttribute(AffectedAttributeProperty, EGameplayModOp::Additive, NewDelta);
 	}

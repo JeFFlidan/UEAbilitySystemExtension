@@ -119,11 +119,6 @@ void UMvPawnExtensionComponent::OnAbilitySystemUninitialized_RegisterAndCall(
 	{
 		OnAbilitySystemUninitialized.Add(Delegate);
 	}
-
-	if (AbilitySystemComponent)
-	{
-		Delegate.Execute();
-	}
 }
 
 bool UMvPawnExtensionComponent::CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const
