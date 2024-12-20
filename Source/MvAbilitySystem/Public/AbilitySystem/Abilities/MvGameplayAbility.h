@@ -14,7 +14,7 @@ class UMvHeroComponent;
 /**
  * 
  */
-UCLASS(ClassGroup = AbilitySystem, meta = (Category = "Mv Ability System"))
+UCLASS(ClassGroup = AbilitySystem, meta = (Category = "Mv Ability System", DisplayName = "Mv Ability"))
 class MVABILITYSYSTEM_API UMvGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()

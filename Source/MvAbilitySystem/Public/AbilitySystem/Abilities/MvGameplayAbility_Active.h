@@ -55,7 +55,7 @@ struct FMvAbilityMontageInfo
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Mv Active Ability"))
 class MVABILITYSYSTEM_API UMvGameplayAbility_Active : public UMvGameplayAbility
 {
 	GENERATED_BODY()

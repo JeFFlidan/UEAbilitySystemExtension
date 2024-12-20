@@ -12,7 +12,7 @@ class UObject;
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Mv Passive Ability"))
 class MVABILITYSYSTEM_API UMvGameplayAbility_Passive : public UMvGameplayAbility
 {
 	GENERATED_BODY()

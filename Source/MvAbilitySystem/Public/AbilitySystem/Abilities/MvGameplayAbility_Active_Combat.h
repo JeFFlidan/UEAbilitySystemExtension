@@ -8,7 +8,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Mv Combat Ability"))
 class MVABILITYSYSTEM_API UMvGameplayAbility_Active_Combat : public UMvGameplayAbility_Active
 {
 	GENERATED_BODY()

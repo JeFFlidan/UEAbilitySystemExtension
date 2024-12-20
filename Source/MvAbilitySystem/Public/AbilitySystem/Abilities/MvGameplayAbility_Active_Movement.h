@@ -10,7 +10,7 @@ class UObject;
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "Mv Movement Ability"))
 class MVABILITYSYSTEM_API UMvGameplayAbility_Active_Movement : public UMvGameplayAbility_Active
 {
     GENERATED_BODY()
