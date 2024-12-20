@@ -51,19 +51,19 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 void UMvGameplayAbility_Active_Combat::OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	Super::OnEventReceived(EventTag, EventData);
+	//
+	// AActor* HitActor{EventData.Target};
+	// if (HitActors.Contains(HitActor))
+	// {
+	// 	return;
+	// }
+	//
+	// HitActors.AddUnique(HitActor);
 
-	AActor* HitActor{EventData.Target};
-	if (HitActors.Contains(HitActor))
-	{
-		return;
-	}
-
-	HitActors.AddUnique(HitActor);
-
-	CurrentActorInfo->AnimInstance.Get()->Montage_Pause(CurrentAnimMontage);
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::ResetMontage, PauseHitMontage);
-	(void)ApplyGameplayEffectToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageEffectClass, 1);
+	// CurrentActorInfo->AnimInstance.Get()->Montage_Pause(CurrentAnimMontage);
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::ResetMontage, PauseHitMontage);
+	// (void)ApplyGameplayEffectToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageEffectClass, 1);
 }
 
 void UMvGameplayAbility_Active_Combat::ResetMontage() const
