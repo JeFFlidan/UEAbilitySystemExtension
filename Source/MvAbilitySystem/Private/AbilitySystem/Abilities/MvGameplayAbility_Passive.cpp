@@ -9,7 +9,6 @@
 UMvGameplayAbility_Passive::UMvGameplayAbility_Passive(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	ActiveAdditionalGameplayEffectNum = 0;
 	AdditionalGameplayEffectDropChance = 0.01f;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
@@ -34,51 +33,69 @@ void UMvGameplayAbility_Passive::ActivateAbility(
 	auto ApplyGameplayEffect = [&MvASC, this](const FMvAbilitySet_GameplayEffect& EffectInfo)
 	{
 		const UGameplayEffect* GameplayEffect = EffectInfo.GameplayEffectClass->GetDefaultObject<UGameplayEffect>();
-		ActiveGameplayEffectHandles.Add(MvASC->ApplyGameplayEffectToSelf(
+		GrantedGameplayEffectHandles.Add(MvASC->ApplyGameplayEffectToSelf(
 			GameplayEffect, EffectInfo.EffectLevel, MvASC->MakeEffectContext()));
 	};
-
-	if (ActiveGameplayEffectHandles.IsEmpty())
+	
+	if (TriggerEventData)
 	{
-		ApplyGameplayEffect(MainGameplayEffect);
+		const UGameplayEffect* GameplayEffect = MainGameplayEffect.GameplayEffectClass->GetDefaultObject<UGameplayEffect>();
 
-		if (ActiveAdditionalGameplayEffectNum)
+		switch (GameplayEffect->DurationPolicy)
 		{
-			for (int32 i = 0; i != ActiveAdditionalGameplayEffectNum; ++i)
-			{
-				ApplyGameplayEffect(AdditionalGameplayEffects[i]);
-			}
+		case EGameplayEffectDurationType::Instant:
+		case EGameplayEffectDurationType::HasDuration:
+		{
+			MvASC->ApplyGameplayEffectToSelf(GameplayEffect, MainGameplayEffect.EffectLevel, MvASC->MakeEffectContext());
+			break;
+		}
+		case EGameplayEffectDurationType::Infinite:
+			UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvGameplayAbility_Passive::ActivateAbility(): Gameplay Effect with an Infinite Duration Policy can't be applied by a gameplay event."))
+			break;
 		}
 	}
 	else
 	{
-		if (ActiveAdditionalGameplayEffectNum >= AdditionalGameplayEffects.Num()
-			|| AdditionalGameplayEffects.IsEmpty())
-		{
-			EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
-			return;
-		}
-		
-		float RandomNumber = FMath::RandRange(0.01f, 1.0f);
-		if (RandomNumber <= AdditionalGameplayEffectDropChance)
-		{
-			UE_LOG(LogMvAbilitySystem, Display, TEXT("UMvGameplayAbility_Passive::ActivateAbility(): Sub effect will be activated."))
-			ApplyGameplayEffect(AdditionalGameplayEffects[ActiveAdditionalGameplayEffectNum++]);
-		}
+		ApplyGameplayEffect(MainGameplayEffect);
 	}
 
+	for (const FMvAbilitySet_GameplayEffect& MvEffect : DraftedGameplayEffects)
+	{
+		ApplyGameplayEffect(MvEffect);
+	}
+	
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
 }
 
-void UMvGameplayAbility_Passive::RemoveAllActiveGameplayEffects()
+void UMvGameplayAbility_Passive::DraftAdditionalGameplayEffect()
+{
+	if (DraftedGameplayEffects.Num() >= AdditionalGameplayEffects.Num())
+	{
+		return;
+	}
+	
+	float RandomNumber = FMath::RandRange(0.01f, 1.0f);
+	if (RandomNumber <= AdditionalGameplayEffectDropChance)
+	{
+		UE_LOG(LogMvAbilitySystem, Display, TEXT("UMvGameplayAbility_Passive::DraftAdditionalGameplayEffect(): Sub effect will be activated."))
+		DraftedGameplayEffects.Add(AdditionalGameplayEffects[DraftedGameplayEffects.Num()]);
+	}
+}
+
+void UMvGameplayAbility_Passive::RemoveGrantedGameplayEffects()
 {
 	UMvAbilitySystemComponent* MvASC = GetMvAbilitySystemComponentFromActorInfo();
     check(MvASC);
 
-	for (const FActiveGameplayEffectHandle& Handle : ActiveGameplayEffectHandles)
+	for (const FActiveGameplayEffectHandle& Handle : GrantedGameplayEffectHandles)
 	{
 		MvASC->RemoveActiveGameplayEffect(Handle);
 	}
 
-	ActiveGameplayEffectHandles.Reset();
+	GrantedGameplayEffectHandles.Reset();
+}
+
+bool UMvGameplayAbility_Passive::IsTriggeredByGameplayEvent() const
+{
+	return !AbilityTriggers.IsEmpty();
 }

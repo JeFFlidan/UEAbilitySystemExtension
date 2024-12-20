@@ -26,7 +26,13 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData) override;
 
-	void RemoveAllActiveGameplayEffects();
+	void DraftAdditionalGameplayEffect();
+	const TArray<FMvAbilitySet_GameplayEffect>& GetDraftedGameplayEffects() const
+	{
+		return DraftedGameplayEffects;
+	}
+	
+	void RemoveGrantedGameplayEffects();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Gameplay Effects")
@@ -39,8 +45,10 @@ protected:
 	float AdditionalGameplayEffectDropChance;
 
 	UPROPERTY()
-	int32 ActiveAdditionalGameplayEffectNum;
+	TArray<FMvAbilitySet_GameplayEffect> DraftedGameplayEffects;
 
 	UPROPERTY()
-	TArray<FActiveGameplayEffectHandle> ActiveGameplayEffectHandles;
+	TArray<FActiveGameplayEffectHandle> GrantedGameplayEffectHandles;
+
+	bool IsTriggeredByGameplayEvent() const;
 };

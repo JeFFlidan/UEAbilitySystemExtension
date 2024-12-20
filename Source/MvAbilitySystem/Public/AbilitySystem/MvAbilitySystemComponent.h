@@ -9,6 +9,7 @@
 class UObject;
 class UMvAttributeSet;
 class UMvGameplayAbility_Active_Combat;
+class UMvGameplayAbility_Passive;
 
 /**
  * 
@@ -26,6 +27,12 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "MVAS|Ability System")
 	static UMvAbilitySystemComponent* FindMvAbilitySystemComponent(AActor* Actor);
+	
+	FGameplayAbilitySpecHandle GrantAbility(const FGameplayAbilitySpec& AbilitySpec);
+
+	// Must be used instead of GiveAbility
+	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability System", meta = (DisplayName = "Grant Ability"))
+	FGameplayAbilitySpecHandle BP_GrantAbility(TSubclassOf<UGameplayAbility> AbilityClass, int32 Level = 0);
 
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
@@ -62,5 +69,6 @@ protected:
 
 	void ActivateCombatAbility(FGameplayAbilitySpec* CombatAbilitySpec);
 
-	UMvGameplayAbility_Active_Combat* GetCombatAbilityFromSpec(FGameplayAbilitySpec* Spec) const;
+	UMvGameplayAbility_Active_Combat* GetCombatAbilityFromSpec(const FGameplayAbilitySpec* Spec) const;
+	UMvGameplayAbility_Passive* GetPassiveAbilityFromSpec(const FGameplayAbilitySpec* Spec) const;
 };

@@ -30,6 +30,37 @@ UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindMvAbilitySystemCompone
 	return Actor ? Actor->FindComponentByClass<UMvAbilitySystemComponent>() : nullptr;
 }
 
+FGameplayAbilitySpecHandle UMvAbilitySystemComponent::GrantAbility(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability.GetClass()->IsChildOf(UMvGameplayAbility_Passive::StaticClass()))
+	{
+		if (const FGameplayAbilitySpec* GrantedSpec = FindAbilitySpecFromClass(AbilitySpec.Ability.GetClass()))
+		{
+			UMvGameplayAbility_Passive* PassiveAbility = GetPassiveAbilityFromSpec(GrantedSpec);
+			PassiveAbility->DraftAdditionalGameplayEffect();
+			return GrantedSpec->Handle;
+		}
+	}
+	
+	return GiveAbility(AbilitySpec);
+}
+
+FGameplayAbilitySpecHandle UMvAbilitySystemComponent::BP_GrantAbility(
+	TSubclassOf<UGameplayAbility> AbilityClass,
+	int32 Level)
+{
+	FGameplayAbilitySpec AbilitySpec = BuildAbilitySpecFromClass(AbilityClass, Level);
+
+	if (!IsValid(AbilitySpec.Ability))
+	{
+		UE_LOG(LogMvAbilitySystem, Error, TEXT("UMvAbilitySystemComponent::BP_GrantAbility() called with an invalid Ability Class."));
+
+		return FGameplayAbilitySpecHandle();
+	}
+
+	return GrantAbility(AbilitySpec);
+}
+
 void UMvAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
 {
 	if (InputTag.IsValid())
@@ -251,7 +282,7 @@ void UMvAbilitySystemComponent::DeactivatePassiveAbilityByClass(TSubclassOf<UGam
 	if (FGameplayAbilitySpec* Spec = FindAbilitySpecFromClass(AbilityClass))
 	{
 		UMvGameplayAbility_Passive* PassiveAbility = CastChecked<UMvGameplayAbility_Passive>(Spec->GetPrimaryInstance());
-		PassiveAbility->RemoveAllActiveGameplayEffects();
+		PassiveAbility->RemoveGrantedGameplayEffects();
 	}
 	else
 	{
@@ -305,7 +336,12 @@ void UMvAbilitySystemComponent::ActivateCombatAbility(FGameplayAbilitySpec* Comb
 	TryActivateAbility(CombatAbilitySpec->Handle);
 }
 
-UMvGameplayAbility_Active_Combat* UMvAbilitySystemComponent::GetCombatAbilityFromSpec(FGameplayAbilitySpec* Spec) const
+UMvGameplayAbility_Active_Combat* UMvAbilitySystemComponent::GetCombatAbilityFromSpec(const FGameplayAbilitySpec* Spec) const
 {
 	return CastChecked<UMvGameplayAbility_Active_Combat>(Spec->GetPrimaryInstance());
+}
+
+UMvGameplayAbility_Passive* UMvAbilitySystemComponent::GetPassiveAbilityFromSpec(const FGameplayAbilitySpec* Spec) const
+{
+	return CastChecked<UMvGameplayAbility_Passive>(Spec->GetPrimaryInstance());
 }
