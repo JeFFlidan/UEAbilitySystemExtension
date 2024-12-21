@@ -3,6 +3,7 @@
 #include "Character/MvHeroComponent.h"
 #include "Character/MvPawnExtensionComponent.h"
 #include "Character/MvPawnData.h"
+#include "Character/MvNPCStateComponent.h"
 #include "Input/MvInputConfig.h"
 #include "Input/MvInputComponent.h"
 #include "Player/MvPlayerState.h"
@@ -63,13 +64,18 @@ bool UMvHeroComponent::CanChangeInitState(UGameFrameworkComponentManager* Manage
 	}
 	if (CurrentState == MvGameplayTags::InitState_Spawned && DesiredState == MvGameplayTags::InitState_DataAvailable)
 	{
+		if (UMvNPCStateComponent::FindNPCStateComponent(GetOwner()))
+		{
+			return true;
+		}
+		
 		if (!GetPlayerState<AMvPlayerState>())
 		{
 			return false;
 		}
-
+		
 		AController* Controller = GetController<AController>();
-
+		
 		bool bHasControllerPossessedPlayerState = Controller &&
 			Controller->PlayerState && Controller->PlayerState->GetOwner() == Controller;
 
@@ -108,15 +114,23 @@ void UMvHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Man
 	{
 		APawn* Pawn = GetPawn<APawn>();
 		AMvPlayerState* PlayerState = GetPlayerState<AMvPlayerState>();
-		UE_LOG(LogMvAbilitySystem, Log, TEXT("In if"))
-		if (!ensure(Pawn && PlayerState))
+
+		UMvNPCStateComponent* NpcState = UMvNPCStateComponent::FindNPCStateComponent(Pawn);
+		if (!NpcState && !ensure(Pawn && PlayerState))
 		{
 			return;
 		}
 
 		if (UMvPawnExtensionComponent* PawnExtComponent = UMvPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
 		{
-			PawnExtComponent->InitializeAbilitySystem(PlayerState->GetMvAbilitySystemComponent(), PlayerState);
+			if (NpcState)
+			{
+				PawnExtComponent->InitializeAbilitySystem(NpcState->GetMvAbilitySystemComponent(), GetOwner());
+			}
+			else
+			{
+				PawnExtComponent->InitializeAbilitySystem(PlayerState->GetMvAbilitySystemComponent(), PlayerState);
+			}
 		}
 
 		if (GetController<APlayerController>())

@@ -34,7 +34,7 @@ public:
 	{
 		return Actor ? Actor->FindComponentByClass<UMvManaComponent>() : nullptr;
 	}
-
+	
 	void InitWithAbilitySystem(UMvAbilitySystemComponent* InASC);
 	void UninitializeFromAbilitySystem();
 

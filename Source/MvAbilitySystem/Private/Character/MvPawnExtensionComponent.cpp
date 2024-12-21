@@ -2,8 +2,7 @@
 
 #include "Character/MvPawnExtensionComponent.h"
 #include "Character/MvPawnData.h"
-#include "GameModes/MvGameplayConfigManagerComponent.h"
-#include "GameModes/MvGameMode.h"
+#include "Character/MvNPCStateComponent.h"
 #include "Player/MvPlayerState.h"
 #include "MvLogChannels.h"
 #include "MvGameplayTags.h"
@@ -23,7 +22,7 @@ UMvPawnExtensionComponent::UMvPawnExtensionComponent(const FObjectInitializer& O
 void UMvPawnExtensionComponent::SetPawnData(const UMvPawnData* InPawnData)
 {
 	check(InPawnData);
-
+	UE_LOG(LogTemp, Display, TEXT("In Set Pawn Data"))
 	if (PawnData)
 	{
 		APawn* Pawn = GetPawnChecked<APawn>();
@@ -55,7 +54,7 @@ void UMvPawnExtensionComponent::InitializeAbilitySystem(
 	APawn* Pawn = GetPawnChecked<APawn>();
 	AActor* ExistingAvatar = InAbilitySystemComponent->GetAvatarActor();
 
-	UE_LOG(LogMvAbilitySystem, Log, TEXT("Setting up ASC %s on pawn %s owner %s, existing %s"),
+	UE_LOG(LogMvAbilitySystem, Log, TEXT("Setting up ASC %s on pawn %s owner %s, existing avatar %s"),
 		*GetNameSafe(InAbilitySystemComponent), *GetNameSafe(Pawn), *GetNameSafe(InOwner), *GetNameSafe(ExistingAvatar));
 
 	if (ExistingAvatar != nullptr && ExistingAvatar != Pawn)
@@ -138,11 +137,7 @@ bool UMvPawnExtensionComponent::CanChangeInitState(UGameFrameworkComponentManage
 	{
 		if (!PawnData)
 		{
-			return false;
-		}
-		
-		if (!GetController<AController>())
-		{
+			UE_LOG(LogTemp, Error, TEXT("INVLAID PAWN DATA"))
 			return false;
 		}
 
@@ -212,8 +207,15 @@ void UMvPawnExtensionComponent::BeginPlay()
 
 	BindOnActorInitStateChanged(NAME_None, FGameplayTag(), false);
 
-	AMvPlayerState* MvPlayerState = GetPlayerState<AMvPlayerState>();
-	MvPlayerState->CallOrRegister_OnPawnDataLoaded(FOnPawnDataLoaded::FDelegate::CreateUObject(this, &ThisClass::OnPawnDataLoaded));
+	if (UMvNPCStateComponent* HeroState = UMvNPCStateComponent::FindNPCStateComponent(GetOwner()))
+	{
+		SetPawnData(HeroState->GetPawnData());
+	}
+	else
+	{
+		AMvPlayerState* MvPlayerState = GetPlayerState<AMvPlayerState>();
+		MvPlayerState->CallOrRegister_OnPawnDataLoaded(FOnPawnDataLoaded::FDelegate::CreateUObject(this, &ThisClass::OnPawnDataLoaded));
+	}
 
 	ensure(TryToChangeInitState(MvGameplayTags::InitState_Spawned));
 	CheckDefaultInitialization();

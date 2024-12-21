@@ -82,7 +82,7 @@ void UMvAbilitySet::GiveToAbilitySystem(
 		AbilitySpec.SourceObject = SourceObject;
 		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.AbilityTag);
 
-		const FGameplayAbilitySpecHandle AbilitySpecHandle = MvASC->GiveAbility(AbilitySpec);
+		const FGameplayAbilitySpecHandle AbilitySpecHandle = MvASC->GrantAbility(AbilitySpec);
 
 		if (OutGrantedHandles)
 		{
