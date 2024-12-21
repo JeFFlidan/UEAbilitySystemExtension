@@ -17,6 +17,8 @@ class MVABILITYSYSTEM_API UMvGameplayAbility_Passive : public UMvGameplayAbility
 {
 	GENERATED_BODY()
 
+	friend class UMvGameplayAbilityValidator;
+
 public:
 	UMvGameplayAbility_Passive(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
@@ -51,4 +53,10 @@ protected:
 	TArray<FActiveGameplayEffectHandle> GrantedGameplayEffectHandles;
 
 	bool IsTriggeredByGameplayEvent() const;
+	UGameplayEffect* GetGameplayEffectCDO(const FMvAbilitySet_GameplayEffect& EffectInfo) const;
+
+public:
+#if WITH_EDITOR
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif
 };
