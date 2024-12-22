@@ -108,7 +108,7 @@ bool UMvGameplayAbility_Passive::IsTriggeredByGameplayEvent() const
 
 UGameplayEffect* UMvGameplayAbility_Passive::GetGameplayEffectCDO(const FMvAbilitySet_GameplayEffect& EffectInfo) const
 {
-	return EffectInfo.GameplayEffectClass->GetDefaultObject<UGameplayEffect>();
+	return EffectInfo.GameplayEffectClass ? EffectInfo.GameplayEffectClass->GetDefaultObject<UGameplayEffect>() : nullptr;
 }
 
 #if WITH_EDITOR
@@ -130,6 +130,11 @@ EDataValidationResult UMvGameplayAbility_Passive::IsDataValid(FDataValidationCon
 	}
 
 	UGameplayEffect* MainEffect = GetGameplayEffectCDO(MainGameplayEffect);
+
+	if (!MainEffect)
+	{
+		return EDataValidationResult::Valid;
+	}
 	
 	if (bIsEventDriven)
 	{
