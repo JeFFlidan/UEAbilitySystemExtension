@@ -56,14 +56,6 @@ void AMvPlayerState::SetPawnData(const UMvPawnData* InPawnData)
 	}
 	
 	PawnData = InPawnData;
-
-	for (const UMvAbilitySet* AbilitySet : PawnData->AbilitySets)
-	{
-		if (AbilitySet)
-		{
-			AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, nullptr);
-		}
-	}
 }
 
 void AMvPlayerState::CallOrRegister_OnPawnDataLoaded(FOnPawnDataLoaded::FDelegate&& Delegate)

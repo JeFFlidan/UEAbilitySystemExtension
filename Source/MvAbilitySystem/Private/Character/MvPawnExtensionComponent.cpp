@@ -6,8 +6,9 @@
 #include "Player/MvPlayerState.h"
 #include "MvLogChannels.h"
 #include "MvGameplayTags.h"
-
+#include "AbilitySystem/MvAbilitySet.h"
 #include "AbilitySystem/MvAbilitySystemComponent.h"
+
 #include "Components/GameFrameworkComponentManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MvPawnExtensionComponent)
@@ -22,7 +23,7 @@ UMvPawnExtensionComponent::UMvPawnExtensionComponent(const FObjectInitializer& O
 void UMvPawnExtensionComponent::SetPawnData(const UMvPawnData* InPawnData)
 {
 	check(InPawnData);
-	UE_LOG(LogTemp, Display, TEXT("In Set Pawn Data"))
+
 	if (PawnData)
 	{
 		APawn* Pawn = GetPawnChecked<APawn>();
@@ -67,6 +68,14 @@ void UMvPawnExtensionComponent::InitializeAbilitySystem(
 
 	AbilitySystemComponent = InAbilitySystemComponent;
 	AbilitySystemComponent->InitAbilityActorInfo(InOwner, Pawn);
+
+	for (const UMvAbilitySet* AbilitySet : PawnData->AbilitySets)
+	{
+		if (AbilitySet)
+		{
+			AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, nullptr);
+		}
+	}
 
 	OnAbilitySystemInitialized.Broadcast();
 }
