@@ -1,11 +1,11 @@
 // Copyright Kyrylo Zaverukha. All Rights Reserved.
 
 #include "AbilitySystem/MvAbilitySystemComponent.h"
-#include "AbilitySystem/Attributes/MvAttributeSet.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Passive.h"
 #include "AbilitySystem/Abilities/MvGameplayAbility_Active_Combat.h"
 #include "Player/MvPlayerState.h"
+#include "Character/MvPawnExtensionComponent.h"
 #include "MvLogChannels.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -27,7 +27,17 @@ UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindPlayerMvAbilitySystemC
 
 UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindMvAbilitySystemComponent(AActor* Actor)
 {
-	return Actor ? Actor->FindComponentByClass<UMvAbilitySystemComponent>() : nullptr;
+	if (!Actor)
+	{
+		return nullptr;
+	}
+	
+	if (UMvPawnExtensionComponent* PawnExtComponent = Actor->FindComponentByClass<UMvPawnExtensionComponent>())
+	{
+		return PawnExtComponent->GetMvAbilitySystemComponent();
+	}
+	
+	return Actor->FindComponentByClass<UMvAbilitySystemComponent>();
 }
 
 FGameplayAbilitySpecHandle UMvAbilitySystemComponent::GrantAbility(const FGameplayAbilitySpec& AbilitySpec)
