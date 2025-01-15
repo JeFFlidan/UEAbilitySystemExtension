@@ -31,7 +31,7 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 	{
 		ResetCombo();
 	}
-		
+
 	const FMvAbilityMontageInfo& MontageInfo = Montages[ComboIndex++];
 
 	// TODO Understand why it does not work stable
