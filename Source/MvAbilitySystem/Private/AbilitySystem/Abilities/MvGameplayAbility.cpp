@@ -20,6 +20,14 @@ UMvAbilitySystemComponent* UMvGameplayAbility::GetMvAbilitySystemComponentFromAc
     return (CurrentActorInfo ? Cast <UMvAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()) : nullptr);
 }
 
+UMvAbilitySystemComponent* UMvGameplayAbility::GetMvAbilitySystemComponent(const AActor* Actor) const
+{
+    UMvAbilitySystemComponent* ASC = UMvAbilitySystemComponent::FindMvAbilitySystemComponent(Actor);
+    check(ASC);
+
+    return ASC;
+}
+
 AController* UMvGameplayAbility::GetControllerFromActorInfo() const
 {
     if (CurrentActorInfo)

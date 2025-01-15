@@ -26,7 +26,7 @@ public:
 	static UMvAbilitySystemComponent* FindPlayerMvAbilitySystemComponent(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "MVAS|Ability System")
-	static UMvAbilitySystemComponent* FindMvAbilitySystemComponent(AActor* Actor);
+	static UMvAbilitySystemComponent* FindMvAbilitySystemComponent(const AActor* Actor);
 	
 	FGameplayAbilitySpecHandle GrantAbility(const FGameplayAbilitySpec& AbilitySpec);
 
