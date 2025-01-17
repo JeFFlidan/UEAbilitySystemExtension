@@ -61,16 +61,15 @@ void UMvGameplayAbility_Active_Combat::OnEventReceived(FGameplayTag EventTag, FG
 	}
 	
 	HitActors.AddUnique(HitActor);
-	
+
+	UMvAbilitySystemComponent* InstigatorASC = GetMvAbilitySystemComponent(EventData.Instigator);
 	UMvAbilitySystemComponent* TargetASC = GetMvAbilitySystemComponent(EventData.Target);
-	TargetASC->ApplyGameplayEffectToSelf(DamageEffectClass.GetDefaultObject(), 1.0f, TargetASC->MakeEffectContext());
+	InstigatorASC->ApplyGameplayEffectToTarget(DamageEffectClass.GetDefaultObject(), TargetASC);
 
 	if (EventData.InstigatorTags.IsValid())
 	{
 		FGameplayEventData EventData2 = EventData;
 		EventData2.EventTag = EventData2.InstigatorTags.First();
-		UMvAbilitySystemComponent* InstigatorASC = GetMvAbilitySystemComponent(EventData.Instigator);
-		check(InstigatorASC);
 		InstigatorASC->HandleGameplayEvent(EventData2.InstigatorTags.First(), &EventData2);
 	}
 

@@ -9,6 +9,15 @@
 
 class UObject;
 
+UENUM(BlueprintType)
+enum class EMvGameplayEffectConsumer : uint8
+{
+	/** Gameplay effect will be applied to the instigator of the gameplay event. */
+	Instigator,
+	/** Gameplay effect will be applied to the target of the gameplay event. */
+	Target
+};
+
 /**
  * 
  */
@@ -40,6 +49,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Gameplay Effects")
 	FMvAbilitySet_GameplayEffect MainGameplayEffect;
 
+	/** Only affects event-driven ability. */
+	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Gameplay Effects")
+	EMvGameplayEffectConsumer MainGameplayEffectConsumer = EMvGameplayEffectConsumer::Instigator;
+
 	UPROPERTY(EditDefaultsOnly, Category = "MVAS|Gameplay Effects")
 	TArray<FMvAbilitySet_GameplayEffect> AdditionalGameplayEffects;
 
@@ -51,8 +64,7 @@ protected:
 
 	UPROPERTY()
 	TArray<FActiveGameplayEffectHandle> GrantedGameplayEffectHandles;
-
-	bool IsTriggeredByGameplayEvent() const;
+	
 	UGameplayEffect* GetGameplayEffectCDO(const FMvAbilitySet_GameplayEffect& EffectInfo) const;
 
 public:

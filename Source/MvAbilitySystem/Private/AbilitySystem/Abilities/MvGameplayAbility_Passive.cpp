@@ -45,14 +45,38 @@ void UMvGameplayAbility_Passive::ActivateAbility(
 	
 	if (TriggerEventData)
 	{
-		const UGameplayEffect* MainEffect = GetGameplayEffectCDO(MainGameplayEffect);
+		UGameplayEffect* MainEffectCDO = GetGameplayEffectCDO(MainGameplayEffect);
 
-		switch (MainEffect->DurationPolicy)
+		switch (MainEffectCDO->DurationPolicy)
 		{
 		case EGameplayEffectDurationType::Instant:
 		case EGameplayEffectDurationType::HasDuration:
 		{
-			MvASC->ApplyGameplayEffectToSelf(MainEffect, MainGameplayEffect.EffectLevel, MvASC->MakeEffectContext());
+			if (!TriggerEventData->Instigator)
+			{
+				UE_LOG(LogMvAbilitySystem, Error, TEXT("Event %s has no instigator."), *TriggerEventData->EventTag.ToString());
+				break;
+			}
+
+			if (!TriggerEventData->Target)
+			{
+				UE_LOG(LogMvAbilitySystem, Error, TEXT("Event %s has no target."), *TriggerEventData->EventTag.ToString());
+				break;
+			}
+			
+			UMvAbilitySystemComponent* InstigatorASC = GetMvAbilitySystemComponent(TriggerEventData->Instigator);
+			UMvAbilitySystemComponent* TargetASC = GetMvAbilitySystemComponent(TriggerEventData->Target);
+			
+			switch (MainGameplayEffectConsumer)
+			{
+			case EMvGameplayEffectConsumer::Instigator:
+				InstigatorASC->ApplyGameplayEffectToSelf(MainEffectCDO, MainGameplayEffect.EffectLevel, InstigatorASC->MakeEffectContext());
+				break;
+			case EMvGameplayEffectConsumer::Target:
+				InstigatorASC->ApplyGameplayEffectToTarget(MainEffectCDO, TargetASC, MainGameplayEffect.EffectLevel, InstigatorASC->MakeEffectContext());
+				break;
+			}
+			
 			break;
 		}
 		case EGameplayEffectDurationType::Infinite:
@@ -99,11 +123,6 @@ void UMvGameplayAbility_Passive::RemoveGrantedGameplayEffects()
 	}
 
 	GrantedGameplayEffectHandles.Reset();
-}
-
-bool UMvGameplayAbility_Passive::IsTriggeredByGameplayEvent() const
-{
-	return !AbilityTriggers.IsEmpty();
 }
 
 UGameplayEffect* UMvGameplayAbility_Passive::GetGameplayEffectCDO(const FMvAbilitySet_GameplayEffect& EffectInfo) const
