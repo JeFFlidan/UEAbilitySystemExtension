@@ -25,7 +25,7 @@ UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindPlayerMvAbilitySystemC
 	return PlayerState->GetMvAbilitySystemComponent();
 }
 
-UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindMvAbilitySystemComponent(AActor* Actor)
+UMvAbilitySystemComponent* UMvAbilitySystemComponent::FindMvAbilitySystemComponent(const AActor* Actor)
 {
 	if (!Actor)
 	{

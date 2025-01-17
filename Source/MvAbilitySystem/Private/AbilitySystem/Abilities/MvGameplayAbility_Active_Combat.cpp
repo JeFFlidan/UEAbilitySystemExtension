@@ -25,12 +25,13 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 	}
 	
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	HitActors.Empty();
 	
 	if (ComboIndex >= Montages.Num())
 	{
 		ResetCombo();
 	}
-		
+
 	const FMvAbilityMontageInfo& MontageInfo = Montages[ComboIndex++];
 
 	// TODO Understand why it does not work stable
@@ -51,22 +52,41 @@ void UMvGameplayAbility_Active_Combat::ActivateAbility(
 void UMvGameplayAbility_Active_Combat::OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	Super::OnEventReceived(EventTag, EventData);
-	//
-	// AActor* HitActor{EventData.Target};
-	// if (HitActors.Contains(HitActor))
-	// {
-	// 	return;
-	// }
-	//
-	// HitActors.AddUnique(HitActor);
+	check(EventData.Target);
+	
+	AActor* HitActor{EventData.Target};
+	if (HitActors.Contains(HitActor))
+	{
+		return;
+	}
+	
+	HitActors.AddUnique(HitActor);
+	
+	UMvAbilitySystemComponent* TargetASC = GetMvAbilitySystemComponent(EventData.Target);
+	TargetASC->ApplyGameplayEffectToSelf(DamageEffectClass.GetDefaultObject(), 1.0f, TargetASC->MakeEffectContext());
 
-	// CurrentActorInfo->AnimInstance.Get()->Montage_Pause(CurrentAnimMontage);
-	// FTimerHandle TimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::ResetMontage, PauseHitMontage);
-	// (void)ApplyGameplayEffectToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageEffectClass, 1);
+	if (EventData.InstigatorTags.IsValid())
+	{
+		FGameplayEventData EventData2 = EventData;
+		EventData2.EventTag = EventData2.InstigatorTags.First();
+		UMvAbilitySystemComponent* InstigatorASC = GetMvAbilitySystemComponent(EventData.Instigator);
+		check(InstigatorASC);
+		InstigatorASC->HandleGameplayEvent(EventData2.InstigatorTags.First(), &EventData2);
+	}
+
+	if (EventData.TargetTags.IsValid())
+	{
+		FGameplayEventData EventData2 = EventData;
+		EventData2.EventTag = EventData2.TargetTags.First();
+		TargetASC->HandleGameplayEvent(EventData2.TargetTags.First(), &EventData2);
+	}
+	
+	CurrentActorInfo->GetAnimInstance()->Montage_Pause(CurrentAnimMontage);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::ResetMontage, PauseHitMontage);
 }
 
 void UMvGameplayAbility_Active_Combat::ResetMontage() const
 {
-	CurrentActorInfo->AnimInstance.Get()->Montage_Resume(CurrentAnimMontage);
+	CurrentActorInfo->GetAnimInstance()->Montage_Resume(CurrentAnimMontage);
 }

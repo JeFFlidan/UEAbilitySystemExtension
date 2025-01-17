@@ -88,7 +88,7 @@ void UMvGameplayAbility_Active::PlayMontageWaitEvent(UAnimMontage* AnimMontage, 
 {
     UAbilityTask_PlayMontageAndWaitForEvent* Task = UAbilityTask_PlayMontageAndWaitForEvent::PlayMontageAndWaitForEvent(
         this, NAME_None, AnimMontage, WaitMontageEvents, RateMontage, StartSection, bStopWhenAbilityEnds);
-
+    
     Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
     Task->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageCompleted);
     Task->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);

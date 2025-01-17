@@ -25,6 +25,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability")
 	UMvAbilitySystemComponent* GetMvAbilitySystemComponentFromActorInfo() const;
 
+	UFUNCTION(BlueprintPure, Category = "MVAS|Ability")
+	UMvAbilitySystemComponent* GetMvAbilitySystemComponent(const AActor* Actor) const;
+
 	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability")
 	AController* GetControllerFromActorInfo() const;
 
