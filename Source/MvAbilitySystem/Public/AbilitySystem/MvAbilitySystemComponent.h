@@ -52,6 +52,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability System")
 	void DeactivatePassiveAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass);
 
+	UFUNCTION(BlueprintCallable, Category = "MVAS|Ability System")
+	int32 GetGameplayEffectActivationCount(TSubclassOf<UGameplayEffect> GameplayEffectClass) const;
+	
+	virtual FActiveGameplayEffectHandle ApplyGameplayEffectSpecToSelf(
+		const FGameplayEffectSpec& GameplayEffect,
+		FPredictionKey PredictionKey
+	) override;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "MVAS|Ability System")
 	float ComboResetTime;
@@ -63,6 +71,8 @@ protected:
 	TArray<FGameplayAbilitySpecHandle> InputPressedSpecHandles;
 	TArray<FGameplayAbilitySpecHandle> InputReleasedSpecHandles;
 	TArray<FGameplayAbilitySpecHandle> InputHeldSpecHandles;
+
+	TMap<UClass*, int32> GameplayEffectActivationsCount;
 
 	virtual void AbilitySpecInputPressed(FGameplayAbilitySpec& Spec) override;
 	virtual void AbilitySpecInputReleased(FGameplayAbilitySpec& Spec) override;

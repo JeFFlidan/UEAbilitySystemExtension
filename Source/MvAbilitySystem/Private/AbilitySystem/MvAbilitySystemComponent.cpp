@@ -301,6 +301,27 @@ void UMvAbilitySystemComponent::DeactivatePassiveAbilityByClass(TSubclassOf<UGam
 	}
 }
 
+int32 UMvAbilitySystemComponent::GetGameplayEffectActivationCount(TSubclassOf<UGameplayEffect> GameplayEffectClass) const
+{
+	if (const int32* Count = GameplayEffectActivationsCount.Find(GameplayEffectClass))
+	{
+		return *Count;
+	}
+
+	return 0;
+}
+
+FActiveGameplayEffectHandle UMvAbilitySystemComponent::ApplyGameplayEffectSpecToSelf(
+	const FGameplayEffectSpec& GameplayEffect,
+	FPredictionKey PredictionKey
+)
+{
+	int32 Value = ++GameplayEffectActivationsCount.FindOrAdd(GameplayEffect.Def.GetClass());
+	UE_LOG(LogMvAbilitySystem, Display, TEXT("Activation Count of %s: %d"), *GameplayEffect.Def.GetName(), Value);
+
+	return Super::ApplyGameplayEffectSpecToSelf(GameplayEffect, PredictionKey);
+}
+
 void UMvAbilitySystemComponent::AbilitySpecInputPressed(FGameplayAbilitySpec& Spec)
 {
 	Super::AbilitySpecInputPressed(Spec);

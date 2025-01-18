@@ -15,7 +15,7 @@ public:
 	static const FGameplayEffectSpec& GetOwnerSpec(const FGameplayEffectCustomExecutionParameters& ExecutionParams);
 	
 	UFUNCTION(BlueprintPure, Category = "MVAS|Gameplay Effect Execution Calculation")
-    static FGameplayTagContainer GetSourceTags(const FGameplayEffectCustomExecutionParameters& ExecutionParams);
+	static FGameplayTagContainer GetSourceTags(const FGameplayEffectCustomExecutionParameters& ExecutionParams);
 
 	UFUNCTION(BlueprintPure, Category = "MVAS|Gameplay Effect Execution Calculation")
 	static FGameplayTagContainer GetTargetTags(const FGameplayEffectCustomExecutionParameters& ExecutionParams);
@@ -25,8 +25,7 @@ public:
 		const FGameplayEffectCustomExecutionParameters& InExecutionParams,
 		const TArray<FGameplayEffectAttributeCaptureDefinition>& InRelevantAttributesToCapture,
 		FGameplayAttribute InAttribute,
-		float& OutMagnitude
-	);
+		float& OutMagnitude);
 
 	UFUNCTION(BlueprintCallable, Category = "MVAS|Gameplay Effect Execution Calculation")
 	static FGameplayEffectCustomExecutionOutput& AddOutputModifier(
