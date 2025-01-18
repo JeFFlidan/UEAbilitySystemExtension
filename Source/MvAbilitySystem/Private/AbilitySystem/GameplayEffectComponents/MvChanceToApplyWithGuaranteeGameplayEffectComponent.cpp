@@ -37,21 +37,26 @@ bool UMvChanceToApplyWithGuaranteeGameplayEffectComponent::CanGameplayEffectAppl
 	const float CalculatedActivationCountForGuaranteedApplication = ActivationCountForGuaranteedApplication.GetValueAtLevel(GESpec.GetLevel(), &ContextString);
 
 	int32 CountForGuaranteedApplication = FMath::Floor(CalculatedActivationCountForGuaranteedApplication);
+	float ApplicationChance = CalculatedBaseChanceToApplyToTarget;
 
-	UMvAbilitySystemComponent* MvASC = Cast<UMvAbilitySystemComponent>(ActiveGEContainer.Owner);
-	check(MvASC);
-
-	int32 ActivationCount = MvASC->GetGameplayEffectActivationCount(GESpec.Def.GetClass());
-	int32 ActivationCountReminder = ActivationCount % CountForGuaranteedApplication;
-	
-	if (ActivationCountReminder == 0)
+	if (CountForGuaranteedApplication)
 	{
-		return true;
-	}
+		UMvAbilitySystemComponent* MvASC = Cast<UMvAbilitySystemComponent>(ActiveGEContainer.Owner);
+		check(MvASC);
 
-	float ApplicationChance = CalculatedBaseChanceToApplyToTarget + (ActivationCountReminder - 1) * CalculatedBonusChanceToApplyToTarget;
-	UE_LOG(LogMvAbilitySystem, Display, TEXT("Application Chance: %f"), ApplicationChance);
+		int32 ActivationCount = MvASC->GetGameplayEffectActivationCount(GESpec.Def.GetClass());
+		int32 ActivationCountReminder = ActivationCount % CountForGuaranteedApplication;
 	
+		if (ActivationCountReminder == 0)
+		{
+			return true;
+		}
+
+		ApplicationChance = CalculatedBaseChanceToApplyToTarget + (ActivationCountReminder - 1) * CalculatedBonusChanceToApplyToTarget;
+	}
+	
+	UE_LOG(LogMvAbilitySystem, Display, TEXT("Application Chance: %f"), ApplicationChance);
+
 	if (ApplicationChance < 1.0f - SMALL_NUMBER && FMath::FRand() > ApplicationChance)
 	{
 		return false;
